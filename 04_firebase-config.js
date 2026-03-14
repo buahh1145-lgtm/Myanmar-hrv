@@ -1,20 +1,19 @@
-// ================================================================
-// firebase-config.js — Firebase ချိတ်ဆက်မှု Configuration
-// ================================================================
-// ⚠️  ဤဖိုင်ကို GitHub ပေါ် upload မလုပ်ပါနှင့်
-//     SETUP GUIDE.md ထဲ Firebase setup လုပ်နည်းကြည့်ပါ
-// ================================================================
+// Firebase SDK
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-export const FIREBASE_CONFIG = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+const firebaseConfig = {
+  apiKey: "AIzaSyBo95ELzWwR6tqQYsweLNKAbNCQM0GciMA",
+  authDomain: "myanmar-hrv.firebaseapp.com",
+  databaseURL: "https://myanmar-hrv-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "myanmar-hrv",
+  storageBucket: "myanmar-hrv.firebasestorage.app",
+  messagingSenderId: "222986219420",
+  appId: "1:222986219420:web:cdee681def1d3052a5a259"
 };
 
-// ================================================================
-// ✅ Setup ပြီးသည်နှင့် ဤဖိုင်ကို .gitignore ထဲ ထည့်ပါ
-// ================================================================
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+export { db };
