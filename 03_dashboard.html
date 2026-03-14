@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>မြန်မာနိုင်ငံ လူ့အခွင့်အရေး Dashboard 2021–2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#0a0d14;--bg2:#111520;--bg3:#171c2e;--card:#1a2035;
+  --brd:rgba(255,255,255,0.07);--brd2:rgba(255,255,255,0.13);
+  --tx:#e8eaf2;--tx2:#8b90a8;--tx3:#4a5070;
+  --red:#e74c5e;--amb:#f0a500;--blu:#3d82e8;--tel:#1ec8a0;
+  --pur:#8b5cf6;--grn:#22c55e;--orn:#f97316;
+  --f:'Noto Sans Myanmar',sans-serif;--m:'IBM Plex Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--f);font-size:13px;line-height:1.6;overflow:hidden}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--brd2);border-radius:3px}
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:210px;background:var(--bg2);border-right:1px solid var(--brd);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.logo{padding:14px;border-bottom:1px solid var(--brd)}
+.logo-fl{display:flex;gap:2px;margin-bottom:7px}
+.logo-fl span{width:5px;height:22px;border-radius:2px}
+.logo-t{font-size:13px;font-weight:700;line-height:1.3}
+.logo-s{font-size:9px;color:var(--tx3);font-family:var(--m);margin-top:1px}
+.ng{padding:8px 5px 2px}
+.nl{font-size:9px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em;padding:0 8px;margin-bottom:2px}
+.nb{display:flex;align-items:center;gap:6px;width:100%;padding:6px 10px;border-radius:5px;border:none;background:transparent;color:var(--tx2);cursor:pointer;font-family:var(--f);font-size:11px;text-align:left;transition:all .12s}
+.nb:hover{background:rgba(255,255,255,.05);color:var(--tx)}
+.nb.active{background:rgba(231,76,94,.13);color:var(--red);border-left:2px solid var(--red)}
+.nc{margin-left:auto;font-family:var(--m);font-size:9px;color:var(--tx3)}
+.sf{padding:8px 12px;border-top:1px solid var(--brd);margin-top:auto;font-size:9px;color:var(--tx3);line-height:1.6}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--brd);padding:8px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0}
+.tb-title{font-size:13px;font-weight:600;flex:1;white-space:nowrap;min-width:80px}
+select{background:var(--card);border:1px solid var(--brd2);color:var(--tx);padding:4px 8px;border-radius:5px;font-family:var(--f);font-size:11px;cursor:pointer;outline:none}
+select:focus{border-color:var(--blu)}
+select option{background:var(--card)}
+.blive{background:rgba(231,76,94,.18);color:var(--red);border:1px solid rgba(231,76,94,.3);font-size:9px;font-family:var(--m);padding:2px 7px;border-radius:4px}
+.cmp{background:rgba(61,130,232,.1);border-bottom:1px solid rgba(61,130,232,.2);padding:5px 14px;font-size:10px;color:var(--blu);display:none;align-items:center;gap:10px}
+.page{display:none;flex:1;overflow:hidden}
+.page.active{display:flex}
+/* MAP */
+.map-wrap{flex:1;position:relative;overflow:hidden}
+#map{width:100%;height:100%;background:#0d1117}
+.leaflet-container{background:#0d1117!important}
+.leaflet-tile{filter:brightness(.65) saturate(.35)}
+.ml{position:absolute;bottom:16px;left:12px;background:rgba(10,13,20,.92);border:1px solid var(--brd2);border-radius:7px;padding:9px 11px;z-index:1000;font-size:10px}
+.ml-t{font-weight:600;color:var(--tx3);margin-bottom:5px;font-size:9px;text-transform:uppercase}
+.ml-r{display:flex;align-items:center;gap:5px;margin-bottom:3px;color:var(--tx2)}
+.ml-d{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.leaflet-popup-content-wrapper{background:rgba(17,21,32,.97)!important;border:1px solid var(--brd2)!important;border-radius:8px!important;color:var(--tx)!important;box-shadow:0 8px 32px rgba(0,0,0,.7)!important}
+.leaflet-popup-content{margin:11px 13px!important;font-family:var(--f)!important;font-size:12px!important;min-width:200px}
+.leaflet-popup-tip{background:rgba(17,21,32,.97)!important}
+.leaflet-popup-close-button{color:var(--tx2)!important;font-size:16px!important;top:5px!important;right:7px!important}
+.pt{font-size:13px;font-weight:700;margin-bottom:1px}
+.ps{font-size:9px;color:var(--tx3);font-family:var(--m);margin-bottom:7px}
+.pg{margin-bottom:7px}
+.ptg{display:inline-block;font-size:9px;font-family:var(--m);padding:2px 6px;border-radius:3px;margin:1px}
+.pr{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--brd)}
+.pr:last-child{border:none}
+.pk{font-size:10px;color:var(--tx2)}.pv{font-size:11px;font-family:var(--m);font-weight:600}
+.pv.red{color:var(--red)}.pv.amb{color:var(--amb)}.pv.blu{color:var(--blu)}
+.pv.pur{color:var(--pur)}.pv.tel{color:var(--tel)}.pv.orn{color:var(--orn)}
+/* STAT PANEL */
+.sp{width:280px;background:var(--bg2);border-left:1px solid var(--brd);overflow-y:auto;display:flex;flex-direction:column;flex-shrink:0}
+.sp-s{padding:10px 12px;border-bottom:1px solid var(--brd)}
+.sp-t{font-size:9px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px;display:flex;align-items:center;justify-content:space-between}
+.sp-r{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.sp-k{font-size:10px;color:var(--tx2)}.sp-v{font-size:11px;font-family:var(--m);font-weight:600}
+.sp-v.red{color:var(--red)}.sp-v.amb{color:var(--amb)}.sp-v.pur{color:var(--pur)}.sp-v.tel{color:var(--tel)}
+.bm{display:flex;flex-direction:column;gap:4px}
+.bm-r{display:flex;align-items:center;gap:5px}
+.bm-l{font-size:9px;color:var(--tx3);min-width:72px;text-align:right}
+.bm-t{flex:1;background:rgba(255,255,255,.05);border-radius:2px;height:13px;overflow:hidden}
+.bm-f{height:100%;border-radius:2px;display:flex;align-items:center;padding:0 4px}
+.bm-n{font-size:9px;font-family:var(--m);color:rgba(255,255,255,.8)}
+.em{background:var(--bg3);border-radius:5px;padding:7px 9px;margin-bottom:5px;border-left:2px solid var(--brd2)}
+.em.kill{border-left-color:var(--red)}.em.air{border-left-color:var(--amb)}
+.em.art{border-left-color:var(--blu)}.em.arbd{border-left-color:var(--pur)}.em.conscript{border-left-color:var(--orn)}
+.em.drone{border-left-color:var(--grn)}
+.em-d{font-size:9px;font-family:var(--m);color:var(--tx3)}
+.em-l{font-size:10px;font-weight:600;color:var(--tx)}
+.em-x{font-size:10px;color:var(--tx2);line-height:1.4;margin-top:1px}
+.em-s{font-size:9px;font-family:var(--m);color:var(--red);margin-top:2px}
+.htbtn{font-size:9px;padding:2px 7px;border:1px solid var(--brd2);border-radius:4px;cursor:pointer;background:rgba(240,165,0,.2);color:var(--amb);font-family:var(--m)}
+/* INNER PAGES */
+.pi{flex:1;overflow-y:auto;padding:14px 18px}
+.mg{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:14px}
+.mc{background:var(--card);border:1px solid var(--brd);border-radius:7px;padding:11px 13px;position:relative;overflow:hidden}
+.mc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.mc.r::before{background:var(--red)}.mc.a::before{background:var(--amb)}
+.mc.b::before{background:var(--blu)}.mc.t::before{background:var(--tel)}
+.mc.p::before{background:var(--pur)}.mc.o::before{background:var(--orn)}
+.mc.g::before{background:var(--grn)}
+.m-l{font-size:9px;color:var(--tx3);margin-bottom:3px}
+.m-v{font-size:20px;font-weight:700;font-family:var(--m);line-height:1}
+.mc.r .m-v{color:var(--red)}.mc.a .m-v{color:var(--amb)}.mc.b .m-v{color:var(--blu)}
+.mc.t .m-v{color:var(--tel)}.mc.p .m-v{color:var(--pur)}.mc.o .m-v{color:var(--orn)}.mc.g .m-v{color:var(--grn)}
+.m-s{font-size:9px;color:var(--tx3);margin-top:2px}
+.cg{display:grid;gap:10px;margin-bottom:10px}
+.c2{grid-template-columns:1fr 1fr}.c3{grid-template-columns:1fr 1fr 1fr}
+.cc{background:var(--card);border:1px solid var(--brd);border-radius:7px;padding:12px}
+.ct{font-size:10px;font-weight:600;color:var(--tx);margin-bottom:8px}
+.cw{position:relative}
+.bl{display:flex;flex-direction:column;gap:5px}
+.br{display:flex;align-items:center;gap:6px}
+.brl{font-size:9px;color:var(--tx2);min-width:90px;text-align:right;flex-shrink:0}
+.brt{flex:1;background:rgba(255,255,255,.05);border-radius:2px;height:15px;overflow:hidden}
+.brf{height:100%;border-radius:2px;display:flex;align-items:center;padding:0 5px}
+.brn{font-size:9px;font-family:var(--m);color:rgba(255,255,255,.85);font-weight:600}
+.tw{overflow:auto;border-radius:6px;border:1px solid var(--brd)}
+table{width:100%;border-collapse:collapse;font-size:10px}
+th{background:var(--bg3);color:var(--tx3);font-size:8px;text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;text-align:left;border-bottom:1px solid var(--brd2);position:sticky;top:0;z-index:2}
+td{padding:6px 8px;border-bottom:1px solid var(--brd);color:var(--tx2)}
+tr:hover td{background:rgba(255,255,255,.02)}
+td:first-child{color:var(--tx);font-weight:500}
+.tag{display:inline-block;font-size:8px;font-family:var(--m);padding:1px 5px;border-radius:3px;font-weight:600}
+.pl{display:flex;flex-direction:column;gap:6px}
+.plr{display:flex;align-items:center;gap:7px}
+.plk{font-size:10px;color:var(--tx2);flex:1}
+.plb{height:4px;border-radius:2px;background:rgba(255,255,255,.06);flex:2;overflow:hidden}
+.plf{height:100%;border-radius:2px}
+.plv{font-size:9px;font-family:var(--m);color:var(--tx3);min-width:36px;text-align:right}
+.sh{font-size:9px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--brd)}
+.ef{display:flex;flex-direction:column;gap:7px}
+.ei{background:var(--bg3);border-radius:5px;padding:8px 10px;border-left:2px solid var(--brd2)}
+.ei.kill{border-left-color:var(--red)}.ei.air{border-left-color:var(--amb)}
+.ei.art{border-left-color:var(--blu)}.ei.arbd{border-left-color:var(--pur)}.ei.conscript{border-left-color:var(--orn)}
+.em2{display:flex;gap:6px;align-items:center;margin-bottom:3px;flex-wrap:wrap}
+.ed{font-size:9px;font-family:var(--m);color:var(--tx3)}.el{font-size:9px;color:var(--blu)}
+.et{font-size:10px;color:var(--tx);line-height:1.4}
+.es{font-size:9px;font-family:var(--m);color:var(--red);margin-top:2px}
+.db{display:inline-block;font-size:8px;font-family:var(--m);padding:1px 5px;border-radius:3px;margin-left:4px}
+.db.up{background:rgba(231,76,94,.2);color:var(--red)}.db.dn{background:rgba(30,200,160,.2);color:var(--tel)}
+.src-badge{display:inline-block;font-size:8px;padding:1px 5px;background:rgba(255,255,255,.07);color:var(--tx3);border-radius:3px;margin-left:4px}
+@media(max-width:900px){.sidebar{display:none}.mg{grid-template-columns:1fr 1fr}.c2,.c3{grid-template-columns:1fr}.sp{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-fl"><span style="background:#FECB00"></span><span style="background:#34A853"></span><span style="background:#EA4335"></span></div>
+    <div class="logo-t">မြန်မာ HRV<br>Dashboard</div>
+    <div class="logo-s">2021 – 2026</div>
+  </div>
+  <div class="ng">
+    <div class="nl">မြေပုံ</div>
+    <button class="nb active" onclick="goPage('map')">🗺 Interactive မြေပုံ</button>
+  </div>
+  <div class="ng">
+    <div class="nl">ခြုံငုံ</div>
+    <button class="nb" onclick="goPage('overview')">📊 Overview</button>
+    <button class="nb" onclick="goPage('airstrikes')">✈ လေကြောင်းတိုက်<span class="nc">776+</span></button>
+    <button class="nb" onclick="goPage('artillery')">💥 လက်နက်ကြီး<span class="nc">890+</span></button>
+  </div>
+  <div class="ng">
+    <div class="nl">လူ့အခွင့်အရေး</div>
+    <button class="nb" onclick="goPage('hrv')">⚖ ချိုးဖောက်မှု (16)<span class="nc">16</span></button>
+    <button class="nb" onclick="goPage('conscript')">🪖 စစ်မှုထမ်း</button>
+    <button class="nb" onclick="goPage('prisoners')">🔒 နိုင်ငံရေးအကျဉ်း<span class="nc">29k+</span></button>
+    <button class="nb" onclick="goPage('idp')">🏕 စစ်ဘေးရှောင်<span class="nc">3M+</span></button>
+  </div>
+  <div class="ng">
+    <div class="nl">ဒေတာ</div>
+    <button class="nb" onclick="goPage('table')">📋 ဖြစ်ရပ်ဇယား</button>
+    <button class="nb" onclick="goPage('timeline')">📅 Timeline</button>
+  </div>
+  <div class="sf">ရင်းမြစ်: AAPP · ACLED<br>UN OHCHR · HRW · RFA<br>Fortify Rights · Excel Data</div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="tb-title" id="pg-title">Interactive မြေပုံ</div>
+    <select id="f-year" onchange="applyFilters()">
+      <option value="all">နှစ်: အားလုံး</option>
+      <option value="2021">2021</option><option value="2022">2022</option>
+      <option value="2023">2023</option><option value="2024">2024</option>
+      <option value="2025">2025</option><option value="2026">2026</option>
+    </select>
+    <select id="f-month" onchange="applyFilters()">
+      <option value="all">လ: အားလုံး</option>
+      <option value="1">ဇန်</option><option value="2">ဖေ</option><option value="3">မတ်</option>
+      <option value="4">ဧပြီ</option><option value="5">မေ</option><option value="6">ဇွန်</option>
+      <option value="7">ဇူ</option><option value="8">သြ</option><option value="9">စက်</option>
+      <option value="10">အောက်</option><option value="11">နို</option><option value="12">ဒီ</option>
+    </select>
+    <select id="f-state" onchange="applyFilters()">
+      <option value="all">ဒေသ: အားလုံး</option>
+      <option value="Sagaing">Sagaing</option><option value="Mandalay">Mandalay</option>
+      <option value="Rakhine">Rakhine</option><option value="Karenni">Karenni</option>
+      <option value="Kachin">Kachin</option><option value="Shan">Shan</option>
+      <option value="Karen">Karen (ကရင်)</option><option value="Chin">Chin</option>
+      <option value="Mon">Mon (မွန်)</option><option value="Bago">Bago</option>
+      <option value="Tanintharyi">Tanintharyi (တနင်သာရီ)</option>
+      <option value="Magway">Magway</option><option value="Yangon">Yangon</option>
+    </select>
+    <select id="f-type" onchange="applyFilters()">
+      <option value="all">အမျိုး: အားလုံး</option>
+      <option value="air">လေကြောင်း</option><option value="art">လက်နက်ကြီး</option>
+      <option value="kill">သတ်ဖြတ်</option><option value="arbd">မတရားဖမ်း</option>
+      <option value="conscript">စစ်မှုထမ်းဖမ်း</option><option value="drone">Drone</option>
+    </select>
+    <span class="blive" id="rcnt">● 0</span>
+  </div>
+  <div class="cmp" id="cmp-bar"><span>📊</span><span id="cmp-txt"></span></div>
+
+  <!-- MAP PAGE -->
+  <div class="page active" id="page-map" style="flex-direction:row">
+    <div class="map-wrap">
+      <div id="map"></div>
+      <div class="ml">
+        <div class="ml-t">သတင်းအမျိုးအစား</div>
+        <div class="ml-r"><div class="ml-d" style="background:#f0a500"></div>လေကြောင်း (EVT)</div>
+        <div class="ml-r"><div class="ml-d" style="background:#3d82e8"></div>လက်နက်ကြီး (EVT)</div>
+        <div class="ml-r"><div class="ml-d" style="background:#e74c5e"></div>သတ်ဖြတ် (EVT)</div>
+        <div class="ml-r"><div class="ml-d" style="background:#8b5cf6"></div>မတရားဖမ်း (EVT)</div>
+        <div class="ml-r"><div class="ml-d" style="background:#f97316"></div>စစ်မှုထမ်းဖမ်း (EVT)</div>
+        <div class="ml-r"><div class="ml-d" style="background:#f0a500;border:2px solid #fff"></div>လေကြောင်း (Excel)</div>
+        <div class="ml-r"><div class="ml-d" style="background:#22c55e;border:2px solid #fff"></div>Drone (Excel)</div>
+        <div style="margin-top:6px;font-size:8px;color:var(--tx3)">⬤ ဖြူနယ်ဘောင် = Excel ဒေတာ<br>🔥 Heatmap = intensity</div>
+      </div>
+    </div>
+    <div class="sp" id="stat-panel">
+      <div class="sp-s">
+        <div class="sp-t" id="sp-title">စစ်ထုတ်မှု: အားလုံး</div>
+        <div class="sp-r"><div class="sp-k">EVT ဖြစ်ရပ်</div><div class="sp-v red" id="sp-tot">0</div></div>
+        <div class="sp-r"><div class="sp-k">Excel ဖြစ်ရပ်</div><div class="sp-v" style="color:var(--grn)" id="sp-xtot">0</div></div>
+        <div class="sp-r"><div class="sp-k">သေဆုံးပေါင်း</div><div class="sp-v red" id="sp-dead">0</div></div>
+        <div class="sp-r"><div class="sp-k">ဒဏ်ရာပေါင်း</div><div class="sp-v amb" id="sp-inj">0</div></div>
+        <div class="sp-r"><div class="sp-k">ဖမ်းဆီး</div><div class="sp-v pur" id="sp-arr">—</div></div>
+        <div class="sp-r"><div class="sp-k">IDP ထိ</div><div class="sp-v tel" id="sp-idp">—</div></div>
+      </div>
+      <div class="sp-s" id="sp-cmp" style="display:none">
+        <div class="sp-t">တစ်လနှင့်တစ်လ နှိုင်း</div>
+        <div id="sp-cmp-detail"></div>
+      </div>
+      <div class="sp-s">
+        <div class="sp-t">
+          <span>Excel ဒေတာ (မွန်၊ ကရင်၊ တနင်သာရီ)</span>
+          <button class="htbtn" id="htbtn" onclick="toggleHeat()">🔥 ON</button>
+        </div>
+        <div class="sp-r"><div class="sp-k">မွန်</div><div class="sp-v" style="color:var(--amb)" id="xs-mon">0</div></div>
+        <div class="sp-r"><div class="sp-k">ကရင်</div><div class="sp-v" style="color:var(--grn)" id="xs-kar">0</div></div>
+        <div class="sp-r"><div class="sp-k">တနင်သာရီ</div><div class="sp-v" style="color:var(--blu)" id="xs-tan">0</div></div>
+      </div>
+      <div class="sp-s">
+        <div class="sp-t">အမျိုးအစားအလိုက်</div>
+        <div class="bm" id="sp-type-bars"></div>
+      </div>
+      <div class="sp-s" style="flex:1;overflow-y:auto">
+        <div class="sp-t">မကြာသေးမီ ဖြစ်ရပ်</div>
+        <div id="sp-events"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div class="page" id="page-overview">
+    <div class="pi">
+      <div class="mg" id="ov-mg"></div>
+      <div class="cg c2">
+        <div class="cc"><div class="ct">နှစ်အလိုက် အရပ်သားသေဆုံး</div><div class="cw" style="height:180px"><canvas id="ch-ov1"></canvas></div></div>
+        <div class="cc"><div class="ct">ဖြစ်ရပ်ခေတ်ရေစီး</div><div class="cw" style="height:180px"><canvas id="ch-ov2"></canvas></div></div>
+      </div>
+      <div class="cg c2">
+        <div class="cc"><div class="ct" id="ov-bt">ချိုးဖောက်မှုအမျိုးအစား</div><div class="bl" id="ov-bars"></div></div>
+        <div class="cc"><div class="ct">ဒေသ 5 ခု နှိုင်းယှဉ်</div><div class="cw" style="height:180px"><canvas id="ch-ov3"></canvas></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AIRSTRIKES -->
+  <div class="page" id="page-airstrikes">
+    <div class="pi">
+      <div class="mg" id="as-mg"></div>
+      <div class="cg c2">
+        <div class="cc"><div class="ct">နှစ်အလိုက် ဖြစ်ရပ်</div><div class="cw" style="height:180px"><canvas id="ch-as1"></canvas></div></div>
+        <div class="cc"><div class="ct" id="as-mt">လအလိုက် ဖြစ်ရပ်</div><div class="cw" style="height:180px"><canvas id="ch-as2"></canvas></div></div>
+      </div>
+      <div class="cg c2">
+        <div class="cc"><div class="ct">ပစ်မှတ်အမျိုး</div><div class="bl" id="as-bars"></div></div>
+        <div class="cc"><div class="ct">မကြာသေးမီ ဖြစ်ရပ်</div><div class="ef" id="as-ev" style="max-height:200px;overflow-y:auto"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARTILLERY -->
+  <div class="page" id="page-artillery">
+    <div class="pi">
+      <div class="mg" id="arty-mg"></div>
+      <div class="cg c2">
+        <div class="cc"><div class="ct">နှစ်အလိုက် ဖြစ်ရပ်</div><div class="cw" style="height:180px"><canvas id="ch-arty1"></canvas></div></div>
+        <div class="cc"><div class="ct" id="arty-mt">လအလိုက် Casualty</div><div class="cw" style="height:180px"><canvas id="ch-arty2"></canvas></div></div>
+      </div>
+      <div class="cc" style="margin-top:0"><div class="ct">ကာလအလိုက် Casualty နှိုင်းယှဉ်</div><div class="bl" id="arty-bars"></div></div>
+    </div>
+  </div>
+
+  <!-- HRV -->
+  <div class="page" id="page-hrv">
+    <div class="pi">
+      <div class="sh">ချိုးဖောက်မှု 16 မျိုး — filter ပြောင်းရင် ဒေတာပြောင်း</div>
+      <div class="cg c2">
+        <div class="cc"><div class="ct" id="hrv-bt">အမျိုးအစားအလိုက်</div><div class="bl" id="hrv-bars"></div></div>
+        <div class="cc"><div class="ct">HRV ခေတ်ရေစီး</div><div class="cw" style="height:200px"><canvas id="ch-hrv1"></canvas></div></div>
+      </div>
+      <div class="cc" style="margin-top:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <div class="ct" style="margin:0">ဖြစ်ရပ်မှတ်တမ်း</div>
+          <select id="hrv-cf" onchange="renderHrvTbl()" style="margin-left:auto;font-size:10px"></select>
+        </div>
+        <div class="tw" style="max-height:280px"><table><thead><tr><th>ရက်</th><th>ဒေသ</th><th>မြို့နယ်</th><th>အမျိုး</th><th>ဖြစ်ရပ်</th><th>သေ</th><th>ဒဏ်</th><th>ရင်းမြစ်</th></tr></thead><tbody id="hrv-tb"></tbody></table></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONSCRIPT -->
+  <div class="page" id="page-conscript">
+    <div class="pi">
+      <div class="sh">စစ်မှုထမ်းဥပဒေ ဒဏ် — ဖေဖော်ဝါရီ ၂၀၂၄ မှ ယနေ့</div>
+      <div class="mg" id="con-mg"></div>
+      <div class="cg c2">
+        <div class="cc"><div class="ct">လအလိုက် ဓမ္မဖမ်းဆီး</div><div class="cw" style="height:180px"><canvas id="ch-con1"></canvas></div></div>
+        <div class="cc"><div class="ct">ထိုင်းနှင့် နိုင်ငံတကာ ထွက်ပြေး</div><div class="cw" style="height:180px"><canvas id="ch-con2"></canvas></div></div>
+      </div>
+      <div class="cg c2">
+        <div class="cc"><div class="ct">ဖမ်းဆီးခံ အုပ်စု</div><div class="pl" id="con-grp"></div></div>
+        <div class="cc"><div class="ct">ဖြစ်ရပ်မှတ်တမ်း</div><div class="ef" id="con-ev" style="max-height:200px;overflow-y:auto"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRISONERS -->
+  <div class="page" id="page-prisoners">
+    <div class="pi">
+      <div class="mg" id="pr-mg"></div>
+      <div class="cg c2">
+        <div class="cc"><div class="ct">နှစ်စဉ် ဖမ်းဆီး/ထိန်းသိမ်း</div><div class="cw" style="height:180px"><canvas id="ch-pr1"></canvas></div></div>
+        <div class="cc"><div class="ct" id="pr-mt">လအလိုက် ဖမ်းဆီး</div><div class="cw" style="height:180px"><canvas id="ch-pr2"></canvas></div></div>
+      </div>
+      <div class="cg c2">
+        <div class="cc"><div class="ct">ဖမ်းဆီးခံ အုပ်စု</div><div class="pl" id="pr-grp"></div></div>
+        <div class="cc"><div class="ct">ထိန်းသိမ်းစဉ် သေဆုံးအကြောင်းရင်း</div><div class="bl" id="pr-bars"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IDP -->
+  <div class="page" id="page-idp">
+    <div class="pi">
+      <div class="mg" id="idp-mg"></div>
+      <div class="cg c2">
+        <div class="cc"><div class="ct">နှစ်စဉ် IDP ဦးရေ</div><div class="cw" style="height:180px"><canvas id="ch-idp1"></canvas></div></div>
+        <div class="cc"><div class="ct">ဒေသအလိုက် IDP</div><div class="bl" id="idp-bars"></div></div>
+      </div>
+      <div class="cc" style="margin-top:0"><div class="ct">လိုအပ်ချက် ဖြည့်ဆည်းနိုင်မှု %</div><div class="pl" id="idp-needs"></div></div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="page" id="page-table">
+    <div class="pi">
+      <div class="sh">ဖြစ်ရပ်မှတ်တမ်းဇယား — EVT + Excel ဒေတာ filter အလုပ်လုပ်</div>
+      <div class="tw" style="max-height:calc(100vh - 160px)">
+        <table><thead><tr><th>ရက်</th><th>ဒေသ</th><th>မြို့နယ်</th><th>အမျိုး</th><th>ဖြစ်ရပ်</th><th>သေ</th><th>ဒဏ်</th><th>ရင်းမြစ်</th></tr></thead>
+        <tbody id="main-tb"></tbody></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="page" id="page-timeline">
+    <div class="pi">
+      <div class="sh">ကာလအလိုက် ဖြစ်ရပ်များ — filter ပြောင်းရင် ပြောင်း</div>
+      <div class="ef" style="max-height:calc(100vh - 160px);overflow-y:auto" id="tl-feed"></div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+</div><!-- /app -->
+<script>
+// =================== DATA ===================
+const HRV_CATS=[
+  {code:'KILL',mm:'သတ်ဖြတ်ခြင်း',c:'#e74c5e'},
+  {code:'DISP',mm:'အစအနဖျောက်',c:'#3d82e8'},
+  {code:'ARBD',mm:'မတရားဖမ်းဆီး',c:'#8b5cf6'},
+  {code:'CHSO',mm:'ကလေးစစ်သား',c:'#ec4899'},
+  {code:'FRLC',mm:'အဓမ္မရွှေ့ပြောင်း',c:'#f0a500'},
+  {code:'RAPE',mm:'မုဒိမ်းပြုကျင့်',c:'#e74c5e'},
+  {code:'OSV',mm:'လိင်ပိုင်းဆိုင်ရာ',c:'#b83347'},
+  {code:'TORT',mm:'ညှဉ်းပန်းနှိပ်',c:'#f0a500'},
+  {code:'FLAB',mm:'အဓမ္မလုပ်အား',c:'#1ec8a0'},
+  {code:'OFM',mm:'သွားလာခွင့်ပိတ်',c:'#22c55e'},
+  {code:'CDP',mm:'ပစ္စည်းသိမ်း/ဖျက်',c:'#8b5cf6'},
+  {code:'FMAR',mm:'အဓမ္မလက်ထပ်',c:'#ec4899'},
+  {code:'FPRO',mm:'အဓမ္မပြည်တန်ဆာ',c:'#b83347'},
+  {code:'HTRF',mm:'လူကုန်ကူး',c:'#e74c5e'},
+  {code:'OFEA',mm:'ပြောဆိုခွင့်ထိပါး',c:'#3d82e8'},
+  {code:'TAXE',mm:'အဓမ္မအခွန်',c:'#f0a500'},
+];
+const TC={air:'#f0a500',art:'#3d82e8',kill:'#e74c5e',arbd:'#8b5cf6',conscript:'#f97316',idp:'#1ec8a0',drone:'#22c55e',helicopter:'#ec4899'};
+const TM={air:'လေကြောင်း',art:'လက်နက်ကြီး',kill:'သတ်ဖြတ်',arbd:'မတရားဖမ်းဆီး',conscript:'စစ်မှုထမ်းဖမ်း',idp:'ဒုက္ခသည်',drone:'Drone',helicopter:'ဟဲလီကော့'};
+const MM=['ဇန်','ဖေ','မတ်','ဧပြီ','မေ','ဇွန်','ဇူ','သြ','စက်','အောက်','နို','ဒီ'];
+
+// EVT dataset (handcoded events)
+const EVT=[
+  {id:1,date:'2021-03-27',year:2021,month:3,state:'Sagaing',twp:'Monywa',type:'kill',cat:'KILL',txt:'ဆန္ဒပြသူ ပစ်ခတ် Armed Forces Day',dead:82,inj:30,idp:0,arr:120,src:'AAPP',lat:22.108,lng:95.135},
+  {id:2,date:'2021-04-09',year:2021,month:4,state:'Bago',twp:'Bago',type:'kill',cat:'KILL',txt:'Bago စစ်ဆင်ရေး RPG ပစ်ခတ်',dead:82,inj:50,idp:5000,arr:0,src:'HRW',lat:17.335,lng:96.479},
+  {id:3,date:'2021-07-09',year:2021,month:7,state:'Chin',twp:'Thantlang',type:'air',cat:'KILL',txt:'Thantlang ကျောင်း ပထမဆုံး airstrike',dead:3,inj:8,idp:8000,arr:0,src:'RFA',lat:22.985,lng:93.370},
+  {id:4,date:'2021-08-14',year:2021,month:8,state:'Kachin',twp:'Hpakant',type:'air',cat:'KILL',txt:'Hpakant ကျေးရွာ လေကြောင်းတိုက်',dead:5,inj:12,idp:2000,arr:0,src:'Fortify',lat:25.490,lng:96.128},
+  {id:5,date:'2021-10-22',year:2021,month:10,state:'Sagaing',twp:'Kale',type:'arbd',cat:'ARBD',txt:'မတရားဖမ်းဆီးမှု ကြီးထွားလာ',dead:0,inj:0,idp:0,arr:450,src:'AAPP',lat:23.189,lng:94.040},
+  {id:6,date:'2022-09-16',year:2022,month:9,state:'Sagaing',twp:'Kan Balu',type:'kill',cat:'KILL',txt:'ကျောင်းသားနှင့် ဆရာ 11 ဦး သတ်ဖြတ်',dead:11,inj:0,idp:0,arr:0,src:'AAPP/HRW',lat:23.581,lng:95.683},
+  {id:7,date:'2022-10-23',year:2022,month:10,state:'Sagaing',twp:'Tigyaing',type:'kill',cat:'KILL',txt:'Let Yet Kone ကျေးရွာ 11 ဦး မီးရှို့',dead:11,inj:0,idp:3000,arr:0,src:'Fortify',lat:23.792,lng:95.939},
+  {id:8,date:'2022-05-20',year:2022,month:5,state:'Sagaing',twp:'Yinmarbin',type:'air',cat:'KILL',txt:'ကျေးရွာ 3 ခုပေါ် ဗုံးကျ',dead:18,inj:25,idp:4000,arr:0,src:'RFA',lat:22.468,lng:95.172},
+  {id:9,date:'2022-07-15',year:2022,month:7,state:'Karenni',twp:'Demoso',type:'air',cat:'KILL',txt:'ဒုက္ခသည်စခန်း လေကြောင်းတိုက်',dead:22,inj:35,idp:12000,arr:0,src:'HRW',lat:19.433,lng:97.617},
+  {id:10,date:'2022-11-08',year:2022,month:11,state:'Mandalay',twp:'Madaya',type:'arbd',cat:'ARBD',txt:'သောင်းကျန်းသူဆိုကာ ဖမ်းဆီး',dead:0,inj:0,idp:0,arr:320,src:'AAPP',lat:22.203,lng:96.134},
+  {id:11,date:'2023-04-11',year:2023,month:4,state:'Sagaing',twp:'Pale',type:'air',cat:'KILL',txt:'Pazigyi NLD ပွဲတော် ဝင်ရောက်ဗုံးကြဲ',dead:168,inj:70,idp:20000,arr:0,src:'UN OHCHR',lat:22.071,lng:94.901},
+  {id:12,date:'2023-06-15',year:2023,month:6,state:'Chin',twp:'Mindat',type:'idp',cat:'FRLC',txt:'ကျေးရွာ 30+ မှ အဓမ္မ ရွှေ့ပြောင်း',dead:0,inj:0,idp:25000,arr:0,src:'HRW',lat:21.360,lng:93.990},
+  {id:13,date:'2023-10-27',year:2023,month:10,state:'Shan',twp:'Laukkai',type:'air',cat:'KILL',txt:'Operation 1027 စစ်ဆင်ရေး',dead:45,inj:80,idp:30000,arr:0,src:'ACLED',lat:23.796,lng:98.844},
+  {id:14,date:'2023-12-09',year:2023,month:12,state:'Rakhine',twp:'Kyauktaw',type:'art',cat:'KILL',txt:'မော်တာကျည် ကျေးရွာ ရမ်းသမ်းပစ်',dead:12,inj:18,idp:8000,arr:0,src:'RFA',lat:20.838,lng:93.026},
+  {id:15,date:'2024-02-01',year:2024,month:2,state:'Nationwide',twp:'Nationwide',type:'arbd',cat:'ARBD',txt:'စစ်မှုထမ်းဥပဒေ ထုတ်ပြန် ဖမ်းဆီးစ',dead:0,inj:0,idp:0,arr:2000,src:'AAPP',lat:19.745,lng:96.129},
+  {id:16,date:'2024-03-14',year:2024,month:3,state:'Mandalay',twp:'Singu',type:'air',cat:'KILL',txt:'Let Pan Hla ဈေးကွက် ဗုံးကျ',dead:27,inj:55,idp:0,arr:0,src:'RFA',lat:22.607,lng:96.019},
+  {id:17,date:'2024-04-11',year:2024,month:4,state:'Rakhine',twp:'Minbya',type:'air',cat:'KILL',txt:'Cluster bomb IHL ချိုးဖောက်',dead:15,inj:20,idp:5000,arr:0,src:'HRW',lat:20.469,lng:93.276},
+  {id:18,date:'2024-05-22',year:2024,month:5,state:'Sagaing',twp:'Shwebo',type:'conscript',cat:'ARBD',txt:'စစ်မှုထမ်း ဘတ်ကားပေါ် ဖမ်းဆီး',dead:0,inj:0,idp:0,arr:180,src:'RFA',lat:22.565,lng:95.704},
+  {id:19,date:'2024-06-28',year:2024,month:6,state:'Karenni',twp:'Demoso',type:'air',cat:'KILL',txt:'ဆေးရုံ လေကြောင်းဗုံးကျ',dead:8,inj:14,idp:3000,arr:0,src:'Fortify',lat:19.433,lng:97.617},
+  {id:20,date:'2024-07-16',year:2024,month:7,state:'Chin',twp:'Falam',type:'conscript',cat:'ARBD',txt:'စစ်မှုထမ်း မြို့နယ်ရုံးရှေ့ ဖမ်း',dead:0,inj:0,idp:0,arr:95,src:'Fortify',lat:22.915,lng:93.678},
+  {id:21,date:'2024-08-10',year:2024,month:8,state:'Rakhine',twp:'Mrauk-U',type:'art',cat:'KILL',txt:'မော်တာ ကျေးရွာ ရမ်းသမ်းပစ်',dead:18,inj:32,idp:10000,arr:0,src:'RFA',lat:20.585,lng:93.225},
+  {id:22,date:'2024-09-05',year:2024,month:9,state:'Sagaing',twp:'Monywa',type:'air',cat:'KILL',txt:'ကျောင်းကို လေကြောင်းဗုံးကြဲ',dead:14,inj:22,idp:0,arr:0,src:'AAPP',lat:22.108,lng:95.135},
+  {id:23,date:'2024-10-20',year:2024,month:10,state:'Kachin',twp:'Tanai',type:'air',cat:'KILL',txt:'IDP စခန်း တိုက်ခိုက်',dead:11,inj:18,idp:4000,arr:0,src:'HRW',lat:26.054,lng:96.425},
+  {id:24,date:'2024-11-12',year:2024,month:11,state:'Karen',twp:'Hpapun',type:'art',cat:'KILL',txt:'ကျေးရွာ လက်နက်ကြီးပစ်',dead:9,inj:15,idp:3000,arr:0,src:'Fortify',lat:17.533,lng:97.458},
+  {id:25,date:'2024-12-18',year:2024,month:12,state:'Sagaing',twp:'Chaung-U',type:'air',cat:'KILL',txt:'Paramotor ဗုံးကြဲ ပထမဆုံး',dead:16,inj:24,idp:0,arr:0,src:'RFA',lat:22.027,lng:95.145},
+  {id:26,date:'2025-01-18',year:2025,month:1,state:'Rakhine',twp:'Mrauk-U',type:'art',cat:'KILL',txt:'မော်တာကျည် ဈေးသည် 28 ဦးသေ',dead:28,inj:25,idp:0,arr:0,src:'RFA',lat:20.585,lng:93.225},
+  {id:27,date:'2025-02-01',year:2025,month:2,state:'Nationwide',twp:'Nationwide',type:'arbd',cat:'ARBD',txt:'AAPP ဖမ်း 29009 milestone',dead:0,inj:0,idp:0,arr:500,src:'AAPP',lat:19.745,lng:96.129},
+  {id:28,date:'2025-02-14',year:2025,month:2,state:'Mandalay',twp:'Mandalay',type:'conscript',cat:'ARBD',txt:'စစ်မှုထမ်း ငြင်းဆန်သူ ဖမ်း',dead:0,inj:0,idp:0,arr:240,src:'RFA',lat:21.974,lng:96.084},
+  {id:29,date:'2025-03-14',year:2025,month:3,state:'Mandalay',twp:'Singu',type:'air',cat:'KILL',txt:'Let Pan Hla ဈေးကွက် ဗုံးကျ (2nd)',dead:27,inj:55,idp:0,arr:0,src:'RFA',lat:22.607,lng:96.019},
+  {id:30,date:'2025-04-08',year:2025,month:4,state:'Sagaing',twp:'Yinmarbin',type:'conscript',cat:'ARBD',txt:'စစ်မှုထမ်း ကျေးရွာ ဝင်ဖမ်း 45',dead:0,inj:0,idp:0,arr:45,src:'Fortify',lat:22.468,lng:95.172},
+  {id:31,date:'2025-05-12',year:2025,month:5,state:'Sagaing',twp:'Wetlet',type:'air',cat:'KILL',txt:'Oe Htein Kwin ကျောင်း ဗုံးကျ',dead:24,inj:30,idp:0,arr:0,src:'Fortify Rights',lat:22.824,lng:95.417},
+  {id:32,date:'2025-06-05',year:2025,month:6,state:'Karenni',twp:'Loikaw',type:'art',cat:'KILL',txt:'Cluster bomb ဆက်တိုက်ပစ်',dead:18,inj:40,idp:5000,arr:0,src:'HRW',lat:19.674,lng:97.211},
+  {id:33,date:'2025-07-20',year:2025,month:7,state:'Kachin',twp:'Hpakant',type:'conscript',cat:'ARBD',txt:'စစ်မှုထမ်း မိုင်းဖော်သမား ဖမ်း',dead:0,inj:0,idp:0,arr:120,src:'RFA',lat:25.490,lng:96.128},
+  {id:34,date:'2025-08-17',year:2025,month:8,state:'Karenni',twp:'Mawchi',type:'air',cat:'KILL',txt:'မူကြိုကျောင်း ဗုံးကျ',dead:25,inj:15,idp:0,arr:0,src:'AAPP',lat:19.168,lng:97.243},
+  {id:35,date:'2025-09-12',year:2025,month:9,state:'Rakhine',twp:'Kyauktaw',type:'air',cat:'KILL',txt:'ကျောင်း 2 ခု ဗုံးကြဲ',dead:23,inj:20,idp:0,arr:0,src:'Fortify',lat:20.838,lng:93.026},
+  {id:36,date:'2025-10-06',year:2025,month:10,state:'Sagaing',twp:'Chaung-U',type:'air',cat:'KILL',txt:'ဘုရားပွဲ Paramotor ဗုံးချ',dead:24,inj:12,idp:0,arr:0,src:'RFA',lat:22.027,lng:95.145},
+  {id:37,date:'2025-11-14',year:2025,month:11,state:'Shan',twp:'Hsipaw',type:'art',cat:'KILL',txt:'ဈေးဝင်းပေါ် မော်တာ',dead:14,inj:28,idp:2000,arr:0,src:'RFA',lat:22.623,lng:97.301},
+  {id:38,date:'2025-12-03',year:2025,month:12,state:'Bago',twp:'Taungoo',type:'conscript',cat:'ARBD',txt:'စစ်မှုထမ်း ဘတ်ကား ဖမ်း 60',dead:0,inj:0,idp:0,arr:60,src:'AAPP',lat:18.933,lng:96.434},
+  {id:39,date:'2026-01-22',year:2026,month:1,state:'Sagaing',twp:'Monywa',type:'air',cat:'KILL',txt:'မြို့ပြင်ကျောင်း တိုက်',dead:16,inj:28,idp:0,arr:0,src:'RFA',lat:22.108,lng:95.135},
+  {id:40,date:'2026-02-10',year:2026,month:2,state:'Rakhine',twp:'Sittwe',type:'art',cat:'KILL',txt:'မြို့ပြင် မော်တာပစ်',dead:9,inj:18,idp:3000,arr:0,src:'Fortify',lat:20.143,lng:92.899},
+  {id:41,date:'2026-03-05',year:2026,month:3,state:'Mandalay',twp:'Madaya',type:'conscript',cat:'ARBD',txt:'စစ်မှုထမ်း ကျေးရွာ ဝင်ဖမ်း',dead:0,inj:0,idp:0,arr:85,src:'RFA',lat:22.203,lng:96.134},
+];
+
+// Excel Data (Mon, Karen, Tanintharyi) from uploaded file
+const XDATA=[{"dt":"24/4/2024","yr":2024,"mo":4,"st":"မွန်","se":"Mon","tw":"ကျိုက်မရော","vl":"ကော့စွယ်ကျေးရွာ","at":"air","atr":"လေကြောင်း","dd":1,"ij":0,"dm":"အမျိုးသမီး","la":16.51125,"ln":97.73669},{"dt":"24/4/2024","yr":2024,"mo":4,"st":"မွန်","se":"Mon","tw":"ကျိုက်မရော","vl":"ကော့နွတ်ကျေးရွာ","at":"air","atr":"လေကြောင်း","dd":0,"ij":1,"dm":"အမျိုးသား","la":16.38282,"ln":97.80528},{"dt":"16/2/2025","yr":2025,"mo":2,"st":"မွန်","se":"Mon","tw":"ကျိုက်မရော","vl":"ကော့ဒွန်ကျေးရွာ","at":"drone","atr":"Drone","dd":0,"ij":0,"dm":"ခရီးသွား အရပ်သား ကား (၃) ပျက်စီးသွားတယ်","la":16.37692,"ln":97.77616},{"dt":"2024-10-04 00:00:00","yr":2024,"mo":0,"st":"မွန်","se":"Mon","tw":"ကျိုက်မရော","vl":"ကော့စွယ်၊ ကော့သပ်၊ ကော့နွတ်","at":"air","atr":"လေကြောင်း","dd":0,"ij":1,"dm":"ကော့သပ်ဒေသခံတစ်ဦး ထိခိုက်ဒဏ်ရာရရှိခဲ့ပြီး ကော့စွယ်၊ ကော့သပ်၊ ကော့နွတ်ရွာတို့မှ န","la":16.52112,"ln":97.75375},{"dt":"2023-08-04 00:00:00","yr":2023,"mo":0,"st":"မွန်","se":"Mon","tw":"ကျိုက်မရော","vl":"ဓမ္မသကျေးရွာ","at":"air","atr":"လေကြောင်း","dd":0,"ij":0,"dm":"ဘုန်းကြီးကျောင်း ဆောင်များ၊ ဘုရားစေတီများ မီးလောင်ပျက်စီးသွား","la":16.5108,"ln":97.80703},{"dt":"21/11/2023","yr":2023,"mo":11,"st":"မွန်","se":"Mon","tw":"ကျိုက်မရော","vl":"တောၚ်ကလေးကျေးရွာ","at":"air","atr":"လေကြောင်း","dd":0,"ij":3,"dm":"ရွာသား (၃) ဦး","la":16.20759,"ln":97.82159},{"dt":"2025-02-09 00:00:00","yr":2025,"mo":0,"st":"မွန်","se":"Mon","tw":"ကျိုက်မရော","vl":"ကော့ဒွန်ကျေးရွာ","at":"drone","atr":"Drone","dd":1,"ij":10,"dm":"ခရီးသွား ပြည်သူ","la":16.37764,"ln":97.77608},{"dt":"2024-04-05 00:00:00","yr":2024,"mo":0,"st":"မွန်","se":"Mon","tw":"ကျိုက်မရော","vl":"‌ကော့ပနောနဲ့ကော့ဒွန်းကျေးရွာ","at":"air","atr":"လေကြောင်း","dd":0,"ij":0,"dm":"‌နေအိမ်(၃)လုံး ပျက်စီးသွားတယ်","la":16.38666,"ln":97.80733},{"dt":"19/4/2024","yr":2024,"mo":4,"st":"မွန်","se":"Mon","tw":"ကျိုက်မရော","vl":"ရတနာနဲ့သံကလောင်ကျေးရွာကြာ","at":"air","atr":"လေကြောင်း","dd":0,"ij":0,"dm":"-","la":16.50184,"ln":97.7911},{"dt":"2025-10-07 00:00:00","yr":2025,"mo":0,"st":"မွန်","se":"Mon","tw":"ဘီးလင်း","vl":"မင်းစောကျေးရွာ","at":"air","atr":"လေကြောင်း","dd":0,"ij":0,"dm":"စာသင်ကျောင်း ပျက်စီးသွားတယ်","la":16.19,"ln":97.88},{"dt":"17/2/2025","yr":2025,"mo":2,"st":"မွန်","se":"Mon","tw":"ဘီးလင်း","vl":"ကော်ဟဲကျေးရွာ","at":"air","atr":"လေကြောင်း","dd":0,"ij":5,"dm":"နေအိမ် (၉) လုံး ပျက်စီးသွားတယ်","la":16.19,"ln":97.88},{"dt":"21/4/2025","yr":2025,"mo":4,"st":"မွန်","se":"Mon","tw":"ဘီးလင်း","vl":"မင်းစောကျေးရွာ","at":"air","atr":"လေကြောင်း","dd":3,"ij":6,"dm":"ဘုန်းကြီး ၁ ပါး နှၚ့် အရပ်သား ၂ ဦး သေဆုံး","la":16.19,"ln":97.88},{"dt":"2024-01-06 00:00:00","yr":2024,"mo":0,"st":"မွန်","se":"Mon","tw":"ဘီးလင်း","vl":"ရွှေရောင်ပြ ကျေးရွာ","at":"air","atr":"လေကြောင်း","dd":0,"ij":0,"dm":"ဘုန်းကြီးအဆောင်နဲ့ နေအိမ်ပျက်စီးသွားတယ်","la":17.16113,"ln":97.30112},{"dt":"2025-09-10 00:00:00","yr":2025,"mo":0,"st":"မွန်","se":"Mon","tw":"ဘီးလင်း","vl":"ပျဉ်းမပင်ဆိပ်ကျေးရွာ","at":"air","atr":"လေကြောင်း","dd":5,"ij":10,"dm":"ကလေးငယ်(၅)ဦးသေဆုံးပြီး အပါဝင်(၁၀)ဦး ထက်မနည်းဒဏ်ရာရရှိ","la":17.49562,"ln":97.4263},{"dt":"2024-10-02 00:00:00","yr":2024,"mo":0,"st":"မွန်","se":"Mon","tw":"ဘီးလင်း","vl":"ဝင်းတာပန်ကျေးရွာ","at":"air","atr":"လေကြောင်း","dd":0,"ij":0,"dm":"ဒေသခံနေအိမ် (၉)လုံး ပျက်စီးသွား","la":17.27538,"ln":97.47105},{"dt":"2025-07-11 00:00:00","yr":2025,"mo":0,"st":"မွန်","se":"Mon","tw":"ဘီးလင်း","vl":"ရွှေရောင်ပြ ကျေးရွာ","at":"air","atr":"လေကြောင်း","dd":0,"ij":0,"dm":"","la":17.16113,"ln":97.30112},{"dt":"2025-07-11 00:00:00","yr":2025,"mo":0,"st":"မွန်","se":"Mon","tw":"ဘီးလင်း","vl":"မိချောင်းအိုင် ကျေးရွာ","at":"air","atr":"လေကြောင်း","dd":0,"ij":0,"dm":"","la":17.15638,"ln":97.33737},{"dt":"18/1/2025","yr":2025,"mo":1,"st":"မွန်","se":"Mon","tw":"ကျိုက်ထို","vl":"ငှက်ပျောတော","at":"drone","atr":"Drone","dd":0,"ij":1,"dm":"-","la":16.85,"ln":97.65},{"dt":"19/1/2025","yr":2025,"mo":1,"st":"မွန်","se":"Mon","tw":"ကျိုက်ထို","vl":"ခရွဲကျေးနယ်","at":"drone","atr":"Drone","dd":0,"ij":0,"dm":"-","la":17.55186,"ln":96.87715},{"dt":"","yr":0,"mo":0,"st":"မွန်","se":"Mon","tw":"ကျိုက်ထို","vl":"စစ်ကွင်းကျေးရွာ","at":"drone","atr":"Drone","dd":0,"ij":0,"dm":"နေအိမ် မှာ မီးလောင်ပျက်ဆီးခဲ့သည်","la":17.54154,"ln":96.88645},{"dt":"2025-01-02 00:00:00","yr":2025,"mo":0,"st":"မွန်","se":"Mon","tw":"ကျိုက်ထို","vl":"ခရွဲကျေးနယ်","at":"drone","atr":"Drone","dd":0,"ij":6,"dm":"ရဲဘော်. ၃ ဦး နှင့် အရပ်သား. ၃ ဦး","la":16.85,"ln":97.65},{"dt":"17/10/2025","yr":2025,"mo":10,"st":"မွန်","se":"Mon","tw":"ကျိုက်ထို","vl":"ကျောက်ဖျာကျေးရွာနှင့်နတ်စင်‌ကျေးရွာ","at":"air","atr":"လေကြောင်း","dd":0,"ij":1,"dm":"အမျိုးသမီး(၁)ဦးနှၚ့်အပါဝၚ်ဒေသခံ(၃)ဦး","la":17.51859,"ln":97.03829},{"dt":"2025-06-05 00:00:00","yr":2025,"mo":0,"st":"မွန်","se":"Mon","tw":"ကျိုက်ထို","vl":"ပိတောက်တောကျေးရွာ","at":"air","atr":"လေကြောင်း","dd":0,"ij":0,"dm":"ထိခိုက်မှုမရှိ","la":16.85,"ln":97.65},{"dt":"2025-10-05 00:00:00","yr":2025,"mo":0,"st":"မွန်","se":"Mon","tw":"ကျိုက်ထို","vl":"၀င်းကံရွာ","at":"air","atr":"လေကြောင်း","dd":0,"ij":2,"dm":"နေအိမ်(4)လုံးမီးလောင်","la":16.85,"ln":97.65},{"dt":"2025-11-05 00:00:00","yr":2025,"mo":0,"st":"မွန်","se":"Mon","tw":"ကျိုက်ထို","vl":"၀င်းကံရွာ","at":"air","atr":"လေကြောင်း","dd":0,"ij":2,"dm":"ပျက်စီးမှု - အိမ် ၁၃ လုံး","la":16.85,"ln":97.65},{"dt":"9.8.2025","yr":2025,"mo":0,"st":"မွန်","se":"Mon","tw":"ကျိုက်ထို","vl":"ပိန္နဲကုန်း ကျေးရွာ","at":"air","atr":"လေကြောင်း","dd":1,"ij":2,"dm":"-","la":16.85,"ln":97.65},{"dt":"24.8.2025","yr":2025,"mo":0,"st":"မွန်","se":"Mon","tw":"ကျိုက်ထို","vl":"ချမ်းမြေ့ကျေးရွာ","at":"air","atr":"လေကြောင်း","dd":3,"ij":4,"dm":"ဘုန်းကြီး","la":16.85,"ln":97.65},{"dt":"13/2/2025","yr":2025,"mo":2,"st":"မွန်","se":"Mon","tw":"ကျိုက်ထို","vl":"ပိန္နဲကုန်း ကျေးရွာ","at":"air","atr":"လေကြောင်း","dd":2,"ij":5,"dm":"တော်လှန်ရေးအဖွဲ့ဝင် ရဲဘော်","la":17.49159,"ln":96.96809},{"dt":"2023-08-05 00:00:00","yr":2023,"mo":0,"st":"မွန်","se":"Mon","tw":"ရေး","vl":"ရေးမြို့နယ်နှင့် သံဖြူဇရပ်မြို့နယ်ကြား","at":"air","atr":"လေကြောင်း","dd":3,"ij":4,"dm":"အမျိုးသမီးတစ်ဦးနှင့် အမျိုးသား ၂ ဦး သေဆုံး","la":16.45977,"ln":97.50508},{"dt":"25/6/2023","yr":2023,"mo":6,"st":"မွန်","se":"Mon","tw":"ရေး","vl":"နှစ်ကရင်ကျေးရွာ","at":"air","atr":"လေကြောင်း","dd":1,"ij":3,"dm":"ဒေသခံပြည်သူ","la":15.56802,"ln":97.74497},{"dt":"27/6/2023","yr":2023,"mo":6,"st":"မွန်","se":"Mon","tw":"ရေး","vl":"အောၚ်သာယာကျေးရွာနဲ့ ကနၚ်းကမော့ကျေးရွာကြာ","at":"air","atr":"လေကြောင်း","dd":0,"ij":0,"dm":"-","la":16.36206,"ln":97.55535},{"dt":"2023-07-05 00:00:00","yr":2023,"mo":0,"st":"မွန်","se":"Mon","tw":"ရေး","vl":"ဝါပသဲကျေးရွာ","at":"air","atr":"လေကြောင်း","dd":0,"ij":0,"dm":"နေအိမ်နဲ့ ပိုင်ဆိုင်မှု မီးလောင်ပျက်စီးသွားတယ်","la":15.58039,"ln":97.92819},{"dt":"2025-01-08 00:00:00","yr":2025,"mo":0,"st":"မွန်","se":"Mon","tw":"ရေး","vl":"ကျောက်တိုင်ကျေးရွာ","at":"air","atr":"လေကြောင်း","dd":0,"ij":0,"dm":"","la":16.37052,"ln":97.77405},{"dt":"2025-08-01 00:00:00","yr":2025,"mo":0,"st":"မွန်","se":"Mon","tw":"ရေး","vl":"ကျောက်တိုင်ကျေးရွာ","at":"air","atr":"လေကြောင်း","dd":0,"ij":0,"dm":"","la":16.41282,"ln":97.77872},{"dt":"2025-01-01 00:00:00","yr":2025,"mo":0,"st":"မွန်","se":"Mon","tw":"ရေး","vl":"ကြုံလောၚ်းရွာဟောၚ်း","at":"air","atr":"လေကြောင်း","dd":0,"ij":0,"dm":"","la":16.23294,"ln":97.64385},{"dt":"2025-11-10 00:00:00","yr":2025,"mo":0,"st":"မွန်","se":"Mon","tw":"ရေး","vl":"","at":"drone","atr":"Drone","dd":0,"ij":0,"dm":"","la":16.54792,"ln":97.87566},{"dt":"2024-05-11 00:00:00","yr":2024,"mo":0,"st":"မွန်","se":"Mon","tw":"သံဖြူဇရပ်","vl":"စခန်းကြီး ကျေးရွာ","at":"air","atr":"လေကြောင်း","dd":0,"ij":3,"dm":"ဒုတိယဗိုလ်မှူးကြီး အပါဝင်း (၃) ဦး","la":15.82287,"ln":97.76669},{"dt":"27-28/3/2021","yr":2021,"mo":3,"st":"ကရင်","se":"Karen","tw":"ဘားကြိုင်","vl":"Day Bu Noh ကျေးရွာ (Pay Kay)","at":"air","atr":"Airstriking","dd":1,"ij":8,"dm":"ကလေး ၂ ဦးသေ (Saw Ta Blut Soe ၈နှစ်၊ မသိ ၂နှစ်)၊ ကျောင်း + အိမ် ၁၂ ပျက်ဆီး","la":18.28,"ln":97.32},{"dt":"28/3/2021","yr":2021,"mo":3,"st":"ကရင်","se":"Karen","tw":"ဘားကြိုင်","vl":"Day Bu Noh ကျေးရွာ (Htee Kyweh Nee + Thay Kha Hta)","at":"air","atr":"Airstriking","dd":0,"ij":3,"dm":"ဒုတိယ airstrike — အိမ် ၂ လုံးပျက်ဆီး","la":18.28,"ln":97.32},{"dt":"28/3/2021","yr":2021,"mo":3,"st":"ကရင်","se":"Karen","tw":"ဘားကြိုင်","vl":"Pah Heh ကျေးရွာ (Paw Kah Der / Lay Ther Hkoh)","at":"air","atr":"Airstriking","dd":1,"ij":3,"dm":"Pah Heh ကျေးရွာ ၂ ကြိမ် ပစ် — ကျောင်း + ဆေးခန်း ပျက်ဆီး","la":18.28,"ln":97.32},{"dt":"29/3/2021","yr":2021,"mo":3,"st":"ကရင်","se":"Karen","tw":"Dwe Lo","vl":"Ler Htoo Poe ရွာ (Mae Thu)","at":"air","atr":"Airstriking","dd":0,"ij":5,"dm":"ကလေး ၅ ဦး ဒဏ်ရာ (၂ ဦးပြင်းထန်) — ကျောင်းတစ်ခုလုံး ပျက်ဆီး","la":17.72,"ln":97.98},{"dt":"30/3/2021","yr":2021,"mo":3,"st":"ကရင်","se":"Karen","tw":"Dwe Lo","vl":"Meh K'law + Khaw Hpoh Kyi ကျေးရွာ (Meh Way)","at":"air","atr":"Airstriking","dd":3,"ij":4,"dm":"Saw Lo Boe (၆၃)၊ Thein Win (၅၅)၊ Saw Hpa Loh Hpoh (၇၆) သေ — ဆန် ၁၇၅ ဝါး + ထွန်စက","la":17.72,"ln":97.98},{"dt":"29/12/2021","yr":2021,"mo":12,"st":"ကရင်","se":"Karen","tw":"ကော့ကရိတ်","vl":"Lay Kay Kaw + Htee Meh Wah Hkee ရွာ","at":"air","atr":"Airstriking","dd":0,"ij":0,"dm":"ဟဲလီကော့ပတာ ၂ + ဗုံးကြဲ ၄ စီး၊ ဒေသခံ ၅ ဦးကျော် ဒဏ်ရာ၊ ၁,၅၀၀+ ထွက်ပြေး","la":17.98,"ln":98.1},{"dt":"2022-06-10 00:00:00","yr":2022,"mo":0,"st":"ကရင်","se":"Karen","tw":"လှာဒကှ်","vl":"မက္ကသာ","at":"air","atr":"Airstriking","dd":0,"ij":0,"dm":"ဘာလကျာ်လီုအာညိ (ဒးဒုင်ဗ္တိုက် ၁ အလန်)","la":17.6,"ln":98.0},{"dt":"16/11/2022","yr":2022,"mo":11,"st":"ကရင်","se":"Karen","tw":"လှာဒကှ်","vl":"","at":"air","atr":"Airstriking","dd":3,"ij":6,"dm":"ဒးဒုင်ဗ္တိုက် ၁ အလန်","la":17.6,"ln":98.0},{"dt":"2022-10-01 00:00:00","yr":2022,"mo":0,"st":"ကရင်","se":"Karen","tw":"ကံကြိက်","vl":"မြို့ဟောင်းရွာ","at":"air","atr":"Airstriking","dd":0,"ij":0,"dm":"ဒးဒုင်ဗ္တိုက် သီုဗလးတိ သီုက္ၜၚ်ကျာ","la":17.38088,"ln":97.56451},{"dt":"21/10/2022","yr":2022,"mo":10,"st":"ကရင်","se":"Karen","tw":"ကံကြိက်","vl":"","at":"air","atr":"Airstriking","dd":0,"ij":0,"dm":"ဒးဒုၚ်ဗ္တိုက်နကဵု က္ၜၚ်ကျာဂှ် မၞိဟ်ချိုတ်ဟၟဲ ဒးလွဟ်ဇၞော်တုဲ ချိုတ်အာမွဲတၠ","la":17.44792,"ln":97.71308},{"dt":"16/12/2022","yr":2022,"mo":12,"st":"ကရင်","se":"Karen","tw":"ကံကြိက်","vl":"ကော့နွဲ့ တံတာအနီး","at":"air","atr":"Airstriking","dd":2,"ij":12,"dm":"လေကြောင်းတိုက်ခိုက်မှုနှင့် လက်နက်ကြီးပစ်ခတ်မှု တစ်ပတ်ကျော် ကြာမြင့်)","la":17.22566,"ln":97.69123},{"dt":"24/1/2023","yr":2023,"mo":1,"st":"ကရင်","se":"Karen","tw":"ကော့ကရိတ်","vl":"ကျုံဒိုး အနီးမှာရှိတဲ့ ကမ်းနီး ရွာ မိဂလုံရွာ ကေ့ာဘိန်းကျေးရွာ","at":"air","atr":"Airstriking","dd":0,"ij":0,"dm":"လေကြောင်းဖြင့်တိုက်ခိုက်ရာတွင် အရပ်သားထိခိုက်မှု","la":17.98,"ln":98.1},{"dt":"20/2/2023","yr":2023,"mo":2,"st":"ကရင်","se":"Karen","tw":"ကော့ကရိတ်","vl":"မိဖညား","at":"air","atr":"Airstriking","dd":0,"ij":0,"dm":"","la":17.98,"ln":98.1},{"dt":"23/5/2023","yr":2023,"mo":5,"st":"ကရင်","se":"Karen","tw":"ကော့ကရိတ်","vl":"ခလယ်လောကျယ်","at":"air","atr":"Airstriking","dd":0,"ij":0,"dm":"အဆောက်အဦးထိခိုက်ပျက်ဆီး","la":17.98,"ln":98.1},{"dt":"24/10/2023","yr":2023,"mo":10,"st":"ကရင်","se":"Karen","tw":"ကော့ကရိတ်","vl":"ဆင်ကုန်းကျေးရွာနဲ့ တတန်ကူးကျေးရွာ","at":"air","atr":"Airstriking","dd":0,"ij":0,"dm":"တိုက်ပွဲဖြစ်ပွားချိန် ကူပစ်ခြင်း","la":17.98,"ln":98.1},{"dt":"2023-02-12 00:00:00","yr":2023,"mo":0,"st":"ကရင်","se":"Karen","tw":"ကော့ကရိတ်","vl":"ရွာသစ်ကုန်","at":"air","atr":"Airstriking","dd":7,"ij":14,"dm":"တိုက်ပွဲဖြစ်ပွားချိန် ကူပစ်ခြင်း","la":17.98,"ln":98.1},{"dt":"1-5/1/2023","yr":2023,"mo":1,"st":"ကရင်","se":"Karen","tw":"ကြာအင်းဆိပ်ကြီး","vl":"ကြားအင်းဆိပ်ကြီးမြို့ပေါ်","at":"air","atr":"Airstriking","dd":0,"ij":10,"dm":"တိုက်ပွဲဖြစ်ပွားချိန် ကူပစ်ခြင်း","la":17.25891,"ln":97.6495},{"dt":"2023-01-01 00:00:00","yr":2023,"mo":0,"st":"ကရင်","se":"Karen","tw":"ကြာအင်းဆိပ်ကြီး","vl":"တောင်စွန်ရွာ","at":"air","atr":"","dd":0,"ij":0,"dm":"တိုက်ပွဲဖြစ်ပွားချိန် ကူပစ်ခြင်း","la":17.56967,"ln":98.02984},{"dt":"2023-02-06 00:00:00","yr":2023,"mo":0,"st":"ကရင်","se":"Karen","tw":"ကြာအင်းဆိပ်ကြီး","vl":"ကြားအင်းဆိပ်ကြီးမြို့ပေါ်","at":"air","atr":"Airstriking","dd":4,"ij":0,"dm":"သံဃာတစ်ပါးပါဝင်","la":17.24536,"ln":97.61972},{"dt":"2023-12-11 00:00:00","yr":2023,"mo":0,"st":"ကရင်","se":"Karen","tw":"ကြာအင်းဆိပ်ကြီး","vl":"ပေါလောကျေးရွာ","at":"air","atr":"Airstriking","dd":2,"ij":0,"dm":"ကလေးငယ်(သေဆုံး)","la":17.76862,"ln":97.56376},{"dt":"31/1/2024","yr":2024,"mo":1,"st":"ကရင်","se":"Karen","tw":"ကော့ကရိတ်","vl":"ချောင်းတောင်ရပ်ကွက်","at":"drone","atr":"Airstriking (Drone)","dd":0,"ij":0,"dm":"တိုက်ပွဲဖြစ်နေသည့်ကာအတွင်း တိုက်ခိုက်ခံရခြင်း","la":17.98,"ln":98.1},{"dt":"18/4/2024","yr":2024,"mo":4,"st":"ကရင်","se":"Karen","tw":"ကော့ကရိတ်","vl":"မြို့ဟောင်းရွာ","at":"air","atr":"Airstriking","dd":1,"ij":4,"dm":"တိုက်ပွဲဖြစ်ပွားခြင်းမရှိ","la":17.98,"ln":98.1},{"dt":"2-7/7/2024","yr":2024,"mo":7,"st":"ကရင်","se":"Karen","tw":"ကော့ကရိတ်","vl":"ကျုံဒိုး","at":"drone","atr":"Airstriking (Drone)","dd":0,"ij":0,"dm":"တိုက်ပွဲဖြစ်ပွားချိန်တွင် ပစ်ကူခြင်း","la":17.98,"ln":98.1},{"dt":"2024-01-10 00:00:00","yr":2024,"mo":0,"st":"ကရင်","se":"Karen","tw":"ကော့ကရိတ်","vl":"လေကေးကော်မြို့သစ်","at":"air","atr":"Airstriking","dd":0,"ij":0,"dm":"တိုက်ပွဲဖြစ်ပွားချိန်တွင် ပစ်ကူခြင်း","la":17.98,"ln":98.1},{"dt":"15/3/2024","yr":2024,"mo":3,"st":"ကရင်","se":"Karen","tw":"ကြာအင်းဆိပ်ကြီး","vl":"လွတ်ရှမ်း","at":"air","atr":"Airstriking","dd":1,"ij":0,"dm":"ဘုန်းကြီးကျောင်း တခုလုံး ထိခိုက်ပျက်စီး","la":17.40821,"ln":97.78689},{"dt":"20-22/4/2024","yr":2024,"mo":4,"st":"ကရင်","se":"Karen","tw":"ကြာအင်းဆိပ်ကြီး","vl":"နှစ်အိမ်ရွာ","at":"air","atr":"Airstriking","dd":0,"ij":3,"dm":"တိုက်ပွဲဖြစ်ပွားခြင်းမရှိ","la":17.36449,"ln":97.92321},{"dt":"19/8/2024","yr":2024,"mo":8,"st":"ကရင်","se":"Karen","tw":"ကြာအင်းဆိပ်ကြီး","vl":"အနန်းကွင်းနှင့်အနီတဝိုက်","at":"air","atr":"Airstriking","dd":0,"ij":0,"dm":"နေအိမ်ထိခိုက်မှု","la":17.79143,"ln":97.75369},{"dt":"18/9/2024","yr":2024,"mo":9,"st":"ကရင်","se":"Karen","tw":"ကြာအင်းဆိပ်ကြီး","vl":"ဖားပြကျေးရွာ","at":"air","atr":"Airstriking","dd":0,"ij":0,"dm":"တိုက်ပွဲဖြစ်ပွားခြင်းမရှိ","la":17.5611,"ln":97.83605},{"dt":"25/10/2024","yr":2024,"mo":10,"st":"ကရင်","se":"Karen","tw":"ကြာအင်းဆိပ်ကြီး","vl":"သံပုရားချောင်ဖျား","at":"air","atr":"Airstriking","dd":1,"ij":0,"dm":"နေအိမ် ၂ လုံးနှင့် ခရစ်ယာန် ဘုရားကျောင်း ၁ ခု ပျက်စီး","la":17.45058,"ln":98.06524},{"dt":"26-27/1/2025","yr":2025,"mo":1,"st":"ကရင်","se":"Karen","tw":"ကော့ကရိတ်","vl":"မြို့ပေါ်","at":"air","atr":"Airstriking","dd":0,"ij":0,"dm":"စာသင်ကျောင်းအပါအဝင် ပြည်သူနေအိမ်တချို့ မီးလောင်ပျက်စီးခဲ့","la":17.98,"ln":98.1},{"dt":"2025-01-02 00:00:00","yr":2025,"mo":0,"st":"ကရင်","se":"Karen","tw":"ကော့ကရိတ်","vl":"ကမိုင်ကုန်နှင့်တောင်ကြာအင်းရွာ","at":"air","atr":"Airstriking","dd":0,"ij":0,"dm":"အရပ်သားနေအိမ်နှင့် ကျေးရွာအုပ်ချုပ်ရေးရုံး ထိခိုက်ပျက်စီး","la":17.98,"ln":98.1},{"dt":"27/2/2025","yr":2025,"mo":2,"st":"ကရင်","se":"Karen","tw":"ကော့ကရိတ်","vl":"ကော့နွဲ့ ရွာ","at":"drone","atr":"Drone","dd":0,"ij":0,"dm":"တိုက်ပွဲဖြစ်ပွားခြင်းမရှိသည့်အချိန်လည် တိုက်ခိုက်ခဲသည်။","la":17.98,"ln":98.1},{"dt":"28/2/2025","yr":2025,"mo":2,"st":"ကရင်","se":"Karen","tw":"ကော့ကရိတ်","vl":"မြို့ပေါ်","at":"drone","atr":"Drone","dd":1,"ij":1,"dm":"တိုက်ပွဲဖြစ်ပွားခြင်းမရှိ","la":17.98,"ln":98.1},{"dt":"19/3/2025","yr":2025,"mo":3,"st":"ကရင်","se":"Karen","tw":"ကော့ကရိတ်","vl":"တဘလုခို့ခီးရွာ","at":"air","atr":"Airstriking","dd":2,"ij":0,"dm":"တိုက်ပွဲဖြစ်ပွားခြင်းမရှိ","la":17.98,"ln":98.1},{"dt":"15/4/2025","yr":2025,"mo":4,"st":"ကရင်","se":"Karen","tw":"ကော့ကရိတ်","vl":"ကမ်းနီကျေးရွာ","at":"air","atr":"Airstriking","dd":0,"ij":0,"dm":"သေဆုံးသူမှာ ဥပုသ်သီလစောင့်နေသူများဖြစ်သည်။","la":17.98,"ln":98.1},{"dt":"16/4/2025","yr":2025,"mo":4,"st":"ကရင်","se":"Karen","tw":"ကော့ကရိတ်","vl":"ကျုံဒိုး၊ ကော့ဝါလဲ၊ သာယာကုန်း၊ နွားခြံကုန်း","at":"air","atr":"Airstriking","dd":0,"ij":0,"dm":"တိုက်ပွဲဖြစ်ပွားချိန်","la":17.98,"ln":98.1},{"dt":"17/4/2025","yr":2025,"mo":4,"st":"ကရင်","se":"Karen","tw":"ကော့ကရိတ်","vl":"ကမ်းနီကျေးရွာနဲ့ သရက်တောကျေးရွာ","at":"air","atr":"Airstriking","dd":1,"ij":2,"dm":"နေအိမ်တွေပါ ထိမှန်ပျက်စီးခဲ့","la":17.98,"ln":98.1},{"dt":"17/4/2025","yr":2025,"mo":4,"st":"ကရင်","se":"Karen","tw":"ကော့ကရိတ်","vl":"တောင်ကြာအင်းကျေးရွာ","at":"air","atr":"Airstriking","dd":0,"ij":0,"dm":"အရပ်သားနေအိမ်နှင့်သာသနအဆောက်အဦး ထိခိုက်ပျက်စီး","la":17.98,"ln":98.1},{"dt":"20/5/2025","yr":2025,"mo":5,"st":"ကရင်","se":"Karen","tw":"ကော့ကရိတ်","vl":"အံကောင်းကျေးရွာနဲ့ လေးတိုင်ကျေးရွာ","at":"air","atr":"Airstriking","dd":2,"ij":0,"dm":"","la":17.98,"ln":98.1},{"dt":"28/5/2025","yr":2025,"mo":5,"st":"ကရင်","se":"Karen","tw":"ကော့ကရိတ်","vl":"Kwileisu Village","at":"air","atr":"Airstriking","dd":0,"ij":5,"dm":"ထိခိုက်သူမှ ကျောင်းသားများဖြစ်သည်။","la":17.98,"ln":98.1},{"dt":"2025-09-06 00:00:00","yr":2025,"mo":0,"st":"ကရင်","se":"Karen","tw":"ကော့ကရိတ်","vl":"ကညင်ကတိုက်ကျေးရွာ","at":"air","atr":"Airstriking","dd":4,"ij":35,"dm":"","la":17.98,"ln":98.1},{"dt":"2025-01-01 00:00:00","yr":2025,"mo":0,"st":"ကရင်","se":"Karen","tw":"ကြာအင်းဆိပ်ကြီး","vl":"တောင်စွန်းကျေးရွာ","at":"air","atr":"Airstriking","dd":0,"ij":0,"dm":"ဒေသခံနှစ်ထောင်ကျော်မှာ နေရပ်စွန့်ခွာ ထွက်ပြေးနေ","la":17.31431,"ln":97.96326},{"dt":"26/2/2025","yr":2025,"mo":2,"st":"ကရင်","se":"Karen","tw":"ကြာအင်းဆိပ်ကြီး","vl":"ပန်းအောင်ကျေးရွာ","at":"air","atr":"Airstriking","dd":1,"ij":10,"dm":"အရပ်သားတစ်ဦးသေဆုံးပြီး သံဃာနှစ်ပါး အပါအဝင် ဆယ်ဦးထိခိုက်ဒဏ်ရာရ","la":17.29602,"ln":98.05952},{"dt":"25/10/2024","yr":2024,"mo":10,"st":"ကရင်","se":"Karen","tw":"ကြာအင်းဆိပ်ကြီး","vl":"သံပုရာချောင်းဖျားကျေးရွာ","at":"air","atr":"Airstriking","dd":1,"ij":1,"dm":"ဒေသခံတယောက် သေဆုံးကာ တယောက် ထိခိုက်ဒဏ်ရာ","la":17.3878,"ln":97.98281},{"dt":"14/5/2022","yr":2022,"mo":5,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ရေဖြူမြို့နယ်","vl":"နဘုလယ်ဒေသ (Nabule)","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"Yebyu PDF + MAF ပထမဆုံး ထိပ်တိုက်တွေ့ Tanintharyi ၌ — Myeik Airbase မှ K-8 တက်ကြ","la":11.8748,"ln":99.14359},{"dt":"ဧပြီ-မေ/2023","yr":2023,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ထားဝယ်မြို့နယ်","vl":"Thayetchaung ဒေသ ရွာ ၇ ခု","at":"air","atr":"Airstrike","dd":1,"ij":0,"dm":"Y-12 လေယာဉ် ၂၈ ကြိမ် + Jet ၈ ကြိမ် ဗုံးကြဲ — ဒေသခံ ၁၀+ ဒဏ်ရာ၊ အိမ် ၁၁ ပျက်ဆီး","la":12.87825,"ln":98.74613},{"dt":"2024-01-09 00:00:00","yr":2024,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"တနင်္သရီမြို့နယ်","vl":"သိန်ခွန်းရွာ","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"ထိခိုက်မှုမရှိ","la":11.8748,"ln":99.14359},{"dt":"29/8/2025","yr":2025,"mo":8,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ပုလောမြို့နယ်","vl":"ဇရပ်ဆိပ်ရွာ","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"ဘုန်းကြီးကျောင်းရှိ အဆောက်အအုံးများ ပျက်စီး","la":13.1567,"ln":98.6019},{"dt":"21/8/2025","yr":2025,"mo":8,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ထားဝယ်မြို့နယ်","vl":"သင်္ကန်းတုန်းရွာ","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"ထိခိုက်မှုမရှိ","la":13.25105,"ln":98.59006},{"dt":"20/8/2025","yr":2025,"mo":8,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"သရက်ချောင်းမြို့နယ်","vl":"စော်ဖျားရွာ","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"စော်ဖျားရွာ ဘုန်းကြီးကျောင်း ထိခိုက်ပျက်စီး","la":14.00117,"ln":98.2925},{"dt":"2025-12-08 00:00:00","yr":2025,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ပုလောမြို့နယ်","vl":"ပလမြို့","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"","la":12.84707,"ln":98.64203},{"dt":"2025-03-08 00:00:00","yr":2025,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"တနင်္သရီမြို့နယ်","vl":"မော်တုန်းရွာ","at":"drone","atr":"Drone","dd":0,"ij":0,"dm":"လူနေအိမ် ၂ လုံးပျက်စီး","la":12.13021,"ln":98.93356},{"dt":"2025-01-08 00:00:00","yr":2025,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ပုလောမြို့နယ်","vl":"ပလမြို့","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"လူနေအိမ် ၂ လုံးပျက်စီး","la":14.00117,"ln":98.2925},{"dt":"26/7/2025","yr":2025,"mo":7,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ပုလောမြို့နယ်","vl":"ပလမြို့","at":"air","atr":"Airstrike","dd":1,"ij":1,"dm":"သံဃာ (၂) ပါး","la":14.00117,"ln":98.2925},{"dt":"25/7/2025","yr":2025,"mo":7,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ပုလောမြို့နယ်","vl":"ဇရပ်ဆိပ်ရွာ","at":"drone","atr":"Drone","dd":10,"ij":5,"dm":"အမျိုးသား (၈) ဦး နှင့် အမျိုးသမီး (၂) ဦးသေဆုံးပြီး အမျိုးသား(၄) ဦး နှင့် အမျိုးသ","la":14.00117,"ln":98.2925},{"dt":"25/7/2025","yr":2025,"mo":7,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ပုလောမြို့နယ်","vl":"တပိုရွာ","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"ထိခိုက်မှုမရှိ","la":11.8748,"ln":99.14359},{"dt":"24/7/2025","yr":2025,"mo":7,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ပုလောမြို့နယ်","vl":"ပလမြို့အပေါ်","at":"air","atr":"Airstrike","dd":2,"ij":0,"dm":"ဇနီးမောင်နှံနှစ်ဦး သေဆုံး","la":14.00117,"ln":98.2925},{"dt":"2025-10-09 00:00:00","yr":2025,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"တနင်္သရီမြို့နယ်","vl":"သိန်ခွန်းရွာ","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"ထိခိုက်မှုမရှိ","la":11.8748,"ln":99.14359},{"dt":"19/7/2025","yr":2025,"mo":7,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ပုလောမြို့နယ်","vl":"မိန်းမရွာ နှင့် ဘိုင်ပြင်ရွာ အကြား","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"အရပ်သား လူကြီးနဲ့ ကလေး (၇) ယောက် ထိခိုက်ဒဏ်ရ ကလေး (၁)ဦး သေဆုံး အိမ် (၃)လုံး ပျက်","la":12.82441,"ln":98.67554},{"dt":"15/9/2025","yr":2025,"mo":9,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ထားဝယ်အရှေ့တောဒေသ","vl":"ပကာရီရွာ","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"ထိခိုက်မှုမရှိ","la":11.8748,"ln":99.14359},{"dt":"2025-11-09 00:00:00","yr":2025,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"တနင်္သရီမြို့နယ်","vl":"သိန်ခွန်းရွာ","at":"air","atr":"Airstrike","dd":1,"ij":0,"dm":"တော်လှန်ရေး တပ်ဖွဲ့ဝင်တစ်ဦးသေဆုံး","la":11.8748,"ln":99.14359},{"dt":"16/7/2025","yr":2025,"mo":7,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"တနင်္သရီမြို့နယ်","vl":"သိန်ခွန်းရွာ","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"ထိခိုက်မှုမရှိ","la":11.8748,"ln":99.14359},{"dt":"14/7/2025","yr":2025,"mo":7,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ပုလောမြို့နယ်","vl":"ဆီတောင်ရွာ","at":"drone","atr":"Drone","dd":0,"ij":1,"dm":"အဖွားအိုတစ်ယောက် ထိခိုက်ဒဏ်ရာရရှိ","la":12.13021,"ln":98.93356},{"dt":"2025-12-07 00:00:00","yr":2025,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ပုလောမြို့နယ်","vl":"ရှမ်းပုံရွာ","at":"drone","atr":"Drone","dd":1,"ij":1,"dm":"တော်လှန်ရေးရဲဘော်တစ်ဦးသေဆုံး ရွာသားတစ်ဦးထိခိုက်ဒဏ်ရာရ","la":12.98992,"ln":98.60163},{"dt":"25/6/2025","yr":2025,"mo":6,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"တနင်္သရီမြို့နယ်","vl":"မော်တုန်းရွာ နှင့် ပဝရွာ","at":"drone","atr":"Drone","dd":0,"ij":0,"dm":"ထိခိုက်မှုမရှိ","la":12.13021,"ln":98.93356},{"dt":"18/6/2025","yr":2025,"mo":6,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"တနင်္သရီမြို့နယ်","vl":"ကြိမ်ချောင်းရွာဟောင်းနှင့် သိန်ခွန်းရွာ","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"ထိခိုက်မှုမရှိ/  ဘုရားကျောင်းပျက်စီး","la":13.08482,"ln":98.88893},{"dt":"19/6/2025","yr":2025,"mo":6,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"တနင်္သရီမြို့နယ်","vl":"သိန်ခွန်းနှင့် အေးသာယာရွာ","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"သိန်ခွန်းစာသင်ကျောင်းပျက်စီး","la":11.8748,"ln":99.14359},{"dt":"2025-07-06 00:00:00","yr":2025,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"သရက်ချောင်းမြို့နယ်","vl":"ကျောက်အိုင်နှင့် မယ်ကဲကျေးရွာ","at":"air","atr":"Airstrike","dd":2,"ij":4,"dm":"လေးဦးထိခိုက်ဒဏ်ရာရ","la":13.20035,"ln":99.0449},{"dt":"17/09/2025","yr":2025,"mo":9,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ထားဝယ်မြို့နယ်","vl":"ပကာရီ၊ ပခပ်နှင့် ရေဝိုင်းကျေးရွာ","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"","la":11.8748,"ln":99.14359},{"dt":"17/09/2025","yr":2025,"mo":9,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"လောင်းလုံးမြို့နယ်","vl":"ဝေဒီကျေးရွာ","at":"air","atr":"Airstrike","dd":2,"ij":0,"dm":"ပွဲချင်းပြီးသေဆုံး","la":12.94731,"ln":98.73605},{"dt":"20/9/2025","yr":2025,"mo":9,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"တနင်္သရီမြို့နယ်","vl":"သိန်ခွန်းရွာ","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"ထိခိုက်မှုမရှိ","la":11.8748,"ln":99.14359},{"dt":"17/9/2025","yr":2025,"mo":9,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ထားဝယ်အရှေ့တောဒေသ","vl":"ပကာရီရွာ","at":"air","atr":"Airstrike","dd":0,"ij":1,"dm":"ကျားခုန်အိုင်ဘုန်းကြီးကျောင်း အမိုးအကာများ ပျက်စီး/အမျိုးသမီးတစ်ဦးဒဏ်ရာရ","la":12.73431,"ln":98.79896},{"dt":"22/5/2025","yr":2025,"mo":5,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"တနင်္သရီမြို့နယ်","vl":"မော်တုန်းရွာ","at":"drone","atr":"Drone","dd":0,"ij":0,"dm":"စာသင်ကျောင်းအဆောက်အအုံ ထိခိုက်ပျက်စီး","la":12.13021,"ln":98.93356},{"dt":"22/5/2025","yr":2025,"mo":5,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"တနင်္သရီမြို့နယ်","vl":"ကျောက်တောင်ရွာ","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"ထိခိုက်မှုမရှိ","la":12.9802,"ln":98.76392},{"dt":"20/5/2025","yr":2025,"mo":5,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ထားဝယ်မြို့နယ်","vl":"အညာဖျားကျေးရွာအုပ်စု","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"ထိခိုက်မှုမရှိ/ ဗုံးကျရောက်ပေါက်ကွဲသည့် နေရာဝန်းကျင်ရှိ နေအိမ်အချို့တွင် ဗုံးအစ ","la":14.03605,"ln":98.27328},{"dt":"19/5/2025","yr":2025,"mo":5,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"သရက်ချောင်းမြို့နယ်","vl":"တောင်ပျောက်တိုက်နယ်ရှိ ဝင်းကဖော်ကျေးရွာ","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"ထိခိုက်မှုမရှိ","la":12.96667,"ln":98.75637},{"dt":"19/5/2025","yr":2025,"mo":5,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"တနင်္သရီမြို့နယ်","vl":"ဘန်းလမွတ်ရွာ","at":"drone","atr":"Drone","dd":0,"ij":0,"dm":"ထိခိုက်မှုမရှိ","la":12.84922,"ln":98.62931},{"dt":"15/5/2025","yr":2025,"mo":5,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ပုလောမြို့နယ်","vl":"ဇာဒီဝင်းရွာ","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"ထိခိုက်မှုမရှိ","la":12.96667,"ln":98.75637},{"dt":"2025-06-05 00:00:00","yr":2025,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ပုလောမြို့နယ်","vl":"ဇရပ်ဆိပ်ကျေးရွာ","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"ထိခိုက်မှုမရှိ","la":14.03605,"ln":98.27328},{"dt":"2025-05-05 00:00:00","yr":2025,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"တနင်္သရီမြို့နယ်","vl":"ချောင်းနှစ်ပေါက်ရွာ","at":"air","atr":"Airstrike","dd":0,"ij":3,"dm":"တော်လှန်ရေးတပ်ဖွဲ့ဝင်သုံးဦး ဒဏ်ရာရ","la":12.13021,"ln":98.93356},{"dt":"2025-04-05 00:00:00","yr":2025,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ထားဝယ်မြို့နယ်","vl":"အညာဖျားရွာ","at":"air","atr":"Airstrike","dd":0,"ij":1,"dm":"အမျိုးသမီးတစ်ဦးဒဏ်ရာရ","la":14.03605,"ln":98.27328},{"dt":"2025-02-05 00:00:00","yr":2025,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"တနင်္သရီမြို့နယ်","vl":"အနောက်မော်တုန်းရွာ","at":"drone","atr":"Drone","dd":0,"ij":0,"dm":"စာသင်ဆောင်အချို့ ထိခိုက်မှုရှိ","la":12.13021,"ln":98.93356},{"dt":"29/4/2025","yr":2025,"mo":4,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"သရက်ချောင်းမြို့နယ်","vl":"ကျောက်ခမောက်ကျေးရွာ","at":"air","atr":"Airstrike","dd":2,"ij":1,"dm":"အရပ်သားနှစ်ဦး သေဆုံး/တစ်ဦးဒဏ်ရာရ","la":14.2947,"ln":98.04165},{"dt":"27/4/2025","yr":2025,"mo":4,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ဘုတ်ပြင်းမြို့နယ်","vl":"ပြည်ကြီးမဏ္ဍိုင်မြို့","at":"air","atr":"Airstrike","dd":0,"ij":1,"dm":"နေအိမ်သုံးဆောင်ခန့်ပျက်စီးသွားပြီး /အမျိုးသမီးတစ်ဦးဒဏ်ရာရ","la":11.47163,"ln":99.00081},{"dt":"27/4/2025","yr":2025,"mo":4,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ရေဖြူမြို့နယ်","vl":"နဘုလယ်ဒေသ","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"ထိခိုက်မှုမရှိ","la":14.2947,"ln":98.04165},{"dt":"25/4/2025","yr":2025,"mo":4,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"သရက်ချောင်းမြို့နယ်","vl":"ဝင်းကဖော် ကျေးရွာ","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"ထိခိုက်မှုမရှိ","la":13.68267,"ln":98.37726},{"dt":"23/4/2025","yr":2025,"mo":4,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ထားဝယ်အရှေ့တောဒေသ","vl":"တောင်သုံးလုံး၊ ကျောက်မဲတောင်ရွာ","at":"air","atr":"Airstrike","dd":1,"ij":0,"dm":"အရပ်သား တစ်ဦးသေဆုံး","la":13.67809,"ln":98.37358},{"dt":"21/4/2025","yr":2025,"mo":4,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"သရက်ချောင်းမြို့နယ်","vl":"ဝင်းဝ၊ မင်းဒပ်၊ သဲချောင်းသားရွာ","at":"air","atr":"Airstrike","dd":0,"ij":1,"dm":"တော်လှန်ရေးရဲဘော်တစ်ဦးဒဏ်ရာရ","la":13.63211,"ln":98.36312},{"dt":"20/4/2025","yr":2025,"mo":4,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"သရက်ချောင်းမြို့နယ်","vl":"မင်းဒပ်ရွာ၊ ကမြိုင်ရွာ","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"ထိခိုက်မှုမရှိ/မင်းဒပ်ရွာ သင်္ချိုင်းက ဇရပ်ပြိုကျ/နေအိမ်တစ်လုံး ဗုံးကျရောက်ပေါက်","la":13.67809,"ln":98.37358},{"dt":"19/4/2025","yr":2025,"mo":4,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"သရက်ချောင်းမြို့နယ်","vl":"မင်းဒပ်၊ ချောင်းဝပြင်၊ ရငဲရွာ","at":"air","atr":"Airstrike","dd":2,"ij":4,"dm":"နှစ်ဦး သေဆုံးပြီး/လေးဦးဒဏ်ရာရ","la":13.63211,"ln":98.36312},{"dt":"18/4/2025","yr":2025,"mo":4,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"သရက်ချောင်းမြို့နယ်","vl":"ဝင်းဝရွာ","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"ထိခိုက်မှုမရှိ","la":13.28709,"ln":98.76181},{"dt":"2025-07-04 00:00:00","yr":2025,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"တနင်္သရီမြို့နယ်","vl":"သိန်ခွန်းရွာ","at":"air","atr":"Airstrike","dd":0,"ij":2,"dm":"တော်လှန်ရေးတပ်ဖွဲ့ဝင်နှစ်ဦး ဒဏ်ရာရ","la":11.8748,"ln":99.14359},{"dt":"2025-05-04 00:00:00","yr":2025,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"တနင်္သရီမြို့နယ်","vl":"ချောင်းနောက်ပြန်ရွာ","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"ထိခိုက်မှုမရှိ","la":12.79201,"ln":99.01615},{"dt":"24/3/2025","yr":2025,"mo":3,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"တနင်္သရီမြို့နယ်","vl":"ချောင်းလမုရွာကျေးရွာ","at":"air","atr":"Airstrike","dd":2,"ij":0,"dm":"အမျိုးသားနှစ်ဦး သေဆုံး/လုပ်သားအိမ်ရာတွေလည်း ပျက်စီး","la":12.78909,"ln":99.0851},{"dt":"23/3/2025","yr":2025,"mo":3,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"တနင်္သရီမြို့နယ်","vl":"သိန်ခွန်းကျေးရွာအုပ်စု","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"ချောင်းနှစ်ပေါက်တံတား ပြိုကျပျက်စီး","la":13.10308,"ln":98.65063},{"dt":"2025-10-03 00:00:00","yr":2025,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"တနင်္သရီမြို့နယ်","vl":"အနောက်မော်တုန်းရွာ","at":"drone","atr":"Drone","dd":0,"ij":0,"dm":"ထိခိုက်မှုမရှိ","la":13.17001,"ln":98.91131},{"dt":"10/3/0205","yr":205,"mo":3,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ဘုတ်ပြင်းမြို့နယ်","vl":"ခဲချောင်းကျေးရွာ","at":"air","atr":"Airstrike","dd":0,"ij":2,"dm":"အရပ်သားနှစ်ဦး ဒဏ်ရာရ","la":12.79362,"ln":99.01415},{"dt":"2025-07-03 00:00:00","yr":2025,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ထားဝယ်အရှေ့တောဒေသ","vl":"ဆိပ်ချောင်းရွာနှင့် ညောင်ချောင်းရွာ","at":"air","atr":"Airstrike","dd":0,"ij":3,"dm":"အရပ်သားသုံးဦးဒဏ်ရာရ","la":12.82693,"ln":99.0281},{"dt":"2025-03-03 00:00:00","yr":2025,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"တနင်္သရီမြို့နယ်","vl":"တကူကျေးရွာအုပ်စု၊ ကော်တောရွာ","at":"air","atr":"Airstrike","dd":0,"ij":3,"dm":"နေအိမ်နှစ်ဆောင် လုံးဝပျက်စီးသွားပြီး အခြားနေအိမ် ငါးဆောင်အနည်းငယ်ပျက်စီး/ကလေးနှစ","la":12.8248,"ln":98.64722},{"dt":"2025-03-03 00:00:00","yr":2025,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"သရက်ချောင်းမြို့နယ်","vl":"ဝင်းကဖော်ရွာ","at":"air","atr":"Airstrike","dd":0,"ij":4,"dm":"ကလေးတစ်ဦးအပါအဝင် ၄ ဦးဒဏ်ရာရ","la":13.24588,"ln":98.87388},{"dt":"2025-01-03 00:00:00","yr":2025,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"တနင်္သရီမြို့နယ်","vl":"မြရာချောင်းကျေးရွာ","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"ထိခိုက်မှုမရှိ/မြရာချောင်းကျေးရွာရှိ ဘုန်းကြီးကျောင်း ထိခိုက်ပျက်စီး","la":12.94847,"ln":98.95013},{"dt":"","yr":0,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"","vl":"","at":"air","atr":"","dd":0,"ij":0,"dm":"","la":12.94051,"ln":98.55973},{"dt":"","yr":0,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"","vl":"","at":"air","atr":"","dd":0,"ij":0,"dm":"","la":12.78268,"ln":99.02724},{"dt":"","yr":0,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"","vl":"","at":"air","atr":"","dd":0,"ij":0,"dm":"","la":12.90107,"ln":98.61696},{"dt":"","yr":0,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"","vl":"","at":"air","atr":"","dd":0,"ij":0,"dm":"","la":12.73633,"ln":98.50586},{"dt":"26/1/2026","yr":2026,"mo":1,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ထားဝယ်မြို့နယ်","vl":"ဘန်းချောင်းဒေသ၊","at":"air","atr":"Airstrike","dd":0,"ij":0,"dm":"ဖောင်းတောရွာရှိ ခရစ္စယာန်အသင်းတော် အဆောက်အအုံအပေါ်ကို ဗုံးတစ်လုံး ကျရောက်ပေါက်ကွ","la":12.80388,"ln":98.75039},{"dt":"2026-11-01 00:00:00","yr":2026,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"တနင်္သာရီမြို့နယ်","vl":"မော်တုန်းရွာနှင့် ကမ်းတိုရွာ","at":"drone","atr":"Drone","dd":0,"ij":1,"dm":"မော်တုန်းရွာက အမျိုးသမီးကြီးတစ်ဦး ဒဏ်ရာရ","la":12.72121,"ln":98.67671},{"dt":"2026-05-01 00:00:00","yr":2026,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"တနင်္သာရီမြို့နယ်","vl":"ဇဝဲကျေးရွာအုပ်စု","at":"drone","atr":"Drone","dd":0,"ij":0,"dm":"လူနေအိမ်တစ်ဆောင် ထိခိုက်ပျက်စီး","la":13.22411,"ln":98.64312},{"dt":"2026-04-02 00:00:00","yr":2026,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ထားဝယ်အရှေ့တော","vl":"ထားဝယ်အရှေ့တော","at":"air","atr":"Airstrike","dd":0,"ij":1,"dm":"ရဟန်းတစ်ပါး ထိခိုက်ဒဏ်ရာရရှိသွား","la":13.11315,"ln":98.62724},{"dt":"2026-06-02 00:00:00","yr":2026,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"ပုလောမြို့နယ်","vl":"မင်းပြင်ရွာ","at":"drone","atr":"Drone","dd":0,"ij":1,"dm":"အသက် ၄၀ ဝန်းကျင်အရွယ် အမျိုးသားတစ်ဦး ဒဏ်ရာရ","la":12.72632,"ln":98.75503},{"dt":"2026-05-02 00:00:00","yr":2026,"mo":0,"st":"တနင်သာရီ","se":"Tanintharyi","tw":"တနင်္သာရီမြို့နယ်","vl":"ရမ်းဖိုရွာ","at":"drone","atr":"Drone","dd":0,"ij":0,"dm":"နေအိမ်နှစ်ဆောင် မီးလောင်ပျက်စီး","la":13.28869,"ln":98.8074}];
+
+// =================== STATE ===================
+let CF={year:'all',month:'all',state:'all',type:'all'};
+let MAP=null, mapMk=[], xMk=[], heatLy=null, heatOn=true;
+let CI={};
+
+// =================== FILTER ===================
+function getF(){
+  return EVT.filter(e=>{
+    if(CF.year!=='all'&&e.year!==+CF.year)return false;
+    if(CF.month!=='all'&&e.month!==+CF.month)return false;
+    if(CF.state!=='all'){
+      const st=CF.state;
+      // map state filter to EVT state field
+      const stMap={Karen:'Karen',Mon:'Mon',Tanintharyi:'Tanintharyi'};
+      if(e.state!==st&&!(st==='Karen'&&e.state==='Karen'))
+        if(e.state!==st)return false;
+    }
+    if(CF.type!=='all'&&e.type!==CF.type)return false;
+    return true;
+  });
+}
+
+function getXF(){
+  return XDATA.filter(e=>{
+    if(CF.year!=='all'&&e.yr!==+CF.year)return false;
+    if(CF.month!=='all'&&e.mo!==+CF.month)return false;
+    if(CF.state!=='all'){
+      const st=CF.state;
+      const seMap={Mon:'မွန်',Karen:'ကရင်',Tanintharyi:'တနင်သာရီ'};
+      if(e.se!==st&&e.st!==seMap[st])return false;
+    }
+    if(CF.type!=='all'){
+      if(CF.type==='air'&&!['air','drone'].includes(e.at))return false;
+      if(CF.type!=='air'&&e.at!==CF.type)return false;
+    }
+    return true;
+  });
+}
+
+function getPrevMonth(){
+  if(CF.month==='all')return null;
+  let pm=+CF.month-1, py=CF.year!=='all'?+CF.year:2024;
+  if(pm===0){pm=12;py--;}
+  return EVT.filter(e=>e.month===pm&&(CF.year==='all'?e.year===py:e.year===py)&&
+    (CF.state==='all'||e.state===CF.state)&&(CF.type==='all'||e.type===CF.type));
+}
+
+function applyFilters(){
+  CF.year=document.getElementById('f-year').value;
+  CF.month=document.getElementById('f-month').value;
+  CF.state=document.getElementById('f-state').value;
+  CF.type=document.getElementById('f-type').value;
+  const f=getF(), xf=getXF();
+  document.getElementById('rcnt').textContent='● '+(f.length+xf.length);
+  // compare banner
+  const prev=getPrevMonth();
+  const bar=document.getElementById('cmp-bar');
+  const cmpSp=document.getElementById('sp-cmp');
+  if(CF.month!=='all'){
+    const mN=MM[+CF.month-1];
+    const pm=+CF.month-1||12;
+    const pmN=MM[pm-1];
+    const cd=f.reduce((s,e)=>s+e.dead,0)+xf.reduce((s,e)=>s+e.dd,0);
+    const pd=prev?prev.reduce((s,e)=>s+e.dead,0):0;
+    const diff=cd-pd;
+    bar.style.display='flex';
+    document.getElementById('cmp-txt').textContent=
+      mN+' vs '+pmN+': ဖြစ်ရပ် '+(f.length+xf.length)+' | သေဆုံး '+(diff>=0?'+':'')+diff+' ဦး';
+    cmpSp.style.display='block';
+    document.getElementById('sp-cmp-detail').innerHTML=
+      '<div class="sp-r"><div class="sp-k">'+mN+' သေဆုံး</div><div class="sp-v red">'+cd+'</div></div>'+
+      '<div class="sp-r"><div class="sp-k">'+pmN+' သေဆုံး <span class="db '+(diff>0?'up':'dn')+'">'+(diff>=0?'+':'')+diff+'</span></div><div class="sp-v '+(diff>0?'red':'tel')+'">'+pd+'</div></div>'+
+      '<div class="sp-r"><div class="sp-k">'+mN+' ဖမ်းဆီး</div><div class="sp-v pur">'+f.reduce((s,e)=>s+e.arr,0)+'</div></div>';
+  } else {
+    bar.style.display='none';
+    cmpSp.style.display='none';
+  }
+  updateMap(f);
+  updateXMap(xf);
+  updateHeat(xf);
+  updateStatPanel(f,xf);
+  renderActivePage(f,xf);
+}
+
+// =================== MAP ===================
+function initMap(){
+  MAP=L.map('map',{center:[18.5,96.5],zoom:6});
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+    {attribution:'',subdomains:'abcd',maxZoom:18}).addTo(MAP);
+}
+
+function updateMap(f){
+  mapMk.forEach(m=>MAP.removeLayer(m));
+  mapMk=[];
+  f.forEach(e=>{
+    if(!e.lat||!e.lng)return;
+    const c=TC[e.type]||'#888';
+    const r=e.dead>50?17:e.dead>20?13:e.dead>5?10:e.arr>100?11:7;
+    const mk=L.circleMarker([e.lat,e.lng],{radius:r,color:c,fillColor:c,fillOpacity:.78,weight:1.5});
+    const cat=HRV_CATS.find(x=>x.code===e.cat);
+    const cc=cat?cat.c:'#888';
+    mk.bindPopup(
+      '<div class="pt">'+e.state+' · '+e.twp+'</div>'+
+      '<div class="ps">'+e.date+' | '+e.src+'</div>'+
+      '<div class="pg">'+
+        '<span class="ptg" style="background:'+c+'22;color:'+c+'">'+( TM[e.type]||e.type)+'</span>'+
+        '<span class="ptg" style="background:'+cc+'22;color:'+cc+'">'+e.cat+'</span>'+
+      '</div>'+
+      '<div style="font-size:10px;color:#8b90a8;margin-bottom:7px">'+e.txt+'</div>'+
+      (e.dead>0?'<div class="pr"><div class="pk">သေဆုံး</div><div class="pv red">'+e.dead+' ဦး</div></div>':'')+
+      (e.inj>0?'<div class="pr"><div class="pk">ဒဏ်ရာ</div><div class="pv amb">'+e.inj+' ဦး</div></div>':'')+
+      (e.arr>0?'<div class="pr"><div class="pk">ဖမ်းဆီး</div><div class="pv pur">'+e.arr+' ဦး</div></div>':'')+
+      (e.idp>0?'<div class="pr"><div class="pk">IDP ထိ</div><div class="pv tel">'+e.idp.toLocaleString()+'</div></div>':'')+
+      '<div class="pr"><div class="pk">ရင်းမြစ်</div><div class="pv" style="color:#555d7a">'+e.src+'</div></div>',
+      {maxWidth:260});
+    mk.addTo(MAP);
+    mapMk.push(mk);
+  });
+}
+
+function updateXMap(xf){
+  xMk.forEach(m=>MAP.removeLayer(m));
+  xMk=[];
+  xf.forEach(e=>{
+    if(!e.la||!e.ln)return;
+    const c=e.at==='drone'?'#22c55e':e.at==='art'?'#3d82e8':'#f0a500';
+    const r=e.dd>5?14:e.dd>2?10:e.ij>5?9:7;
+    const mk=L.circleMarker([e.la,e.ln],{radius:r,color:'#fff',fillColor:c,fillOpacity:.88,weight:2});
+    const stLabel=e.se==='Mon'?'မွန်':e.se==='Karen'?'ကရင်':'တနင်သာရီ';
+    mk.bindPopup(
+      '<div class="pt">'+stLabel+' · '+e.tw+'</div>'+
+      '<div class="ps">'+e.dt+' <span class="src-badge">Excel ဒေတာ</span></div>'+
+      '<div class="pg">'+
+        '<span class="ptg" style="background:'+c+'22;color:'+c+'">'+(TM[e.at]||e.at)+'</span>'+
+      '</div>'+
+      '<div style="font-size:10px;color:#8b90a8;margin-bottom:7px">'+e.dm+'</div>'+
+      (e.dd>0?'<div class="pr"><div class="pk">သေဆုံး</div><div class="pv red">'+e.dd+' ဦး</div></div>':'')+
+      (e.ij>0?'<div class="pr"><div class="pk">ဒဏ်ရာ</div><div class="pv amb">'+e.ij+' ဦး</div></div>':'')+
+      '<div class="pr"><div class="pk">ကျေးရွာ</div><div class="pv blu">'+(e.vl||'—')+'</div></div>'+
+      '<div class="pr"><div class="pk">တပ်/ယူနစ်</div><div class="pv" style="color:#555d7a">'+(e.atr||'—')+'</div></div>',
+      {maxWidth:260});
+    mk.addTo(MAP);
+    xMk.push(mk);
+  });
+}
+
+function updateHeat(xf){
+  if(heatLy){MAP.removeLayer(heatLy);heatLy=null;}
+  if(!heatOn)return;
+  const allPts=[...EVT,...xf.map(e=>({lat:e.la,lng:e.ln,dead:e.dd,inj:e.ij}))]
+    .filter(e=>e.lat&&e.lng);
+  const pts=allPts.map(e=>{
+    const w=Math.max(0.2,Math.min(1,(((e.dead||0)*3+(e.inj||0)+1)/20)));
+    return[e.lat,e.lng,w];
+  });
+  if(!pts.length)return;
+  heatLy=L.heatLayer(pts,{radius:32,blur:22,maxZoom:10,
+    gradient:{0.2:'#1565c0',0.45:'#e65100',0.7:'#c62828',0.9:'#ff1744',1:'#fff'}
+  }).addTo(MAP);
+}
+
+function toggleHeat(){
+  heatOn=!heatOn;
+  const btn=document.getElementById('htbtn');
+  btn.textContent='🔥 '+(heatOn?'ON':'OFF');
+  btn.style.background=heatOn?'rgba(240,165,0,.2)':'rgba(255,255,255,.05)';
+  btn.style.color=heatOn?'#f0a500':'#4a5070';
+  updateHeat(getXF());
+}
+
+// =================== STAT PANEL ===================
+function updateStatPanel(f,xf){
+  const dead=f.reduce((s,e)=>s+e.dead,0)+xf.reduce((s,e)=>s+e.dd,0);
+  const inj=f.reduce((s,e)=>s+e.inj,0)+xf.reduce((s,e)=>s+e.ij,0);
+  const arr=f.reduce((s,e)=>s+e.arr,0);
+  const idp=f.reduce((s,e)=>s+e.idp,0);
+  document.getElementById('sp-tot').textContent=f.length;
+  document.getElementById('sp-xtot').textContent=xf.length;
+  document.getElementById('sp-dead').textContent=dead;
+  document.getElementById('sp-inj').textContent=inj;
+  document.getElementById('sp-arr').textContent=arr>0?arr.toLocaleString():'—';
+  document.getElementById('sp-idp').textContent=idp>0?idp.toLocaleString():'—';
+  // state label
+  let parts=[];
+  if(CF.year!=='all')parts.push(CF.year);
+  if(CF.month!=='all')parts.push(MM[+CF.month-1]+' လ');
+  if(CF.state!=='all')parts.push(CF.state);
+  if(CF.type!=='all')parts.push(TM[CF.type]||CF.type);
+  document.getElementById('sp-title').textContent=parts.length?parts.join(' · '):'စစ်ထုတ်မှု: အားလုံး';
+  // excel by state
+  document.getElementById('xs-mon').textContent=xf.filter(e=>e.se==='Mon').length;
+  document.getElementById('xs-kar').textContent=xf.filter(e=>e.se==='Karen').length;
+  document.getElementById('xs-tan').textContent=xf.filter(e=>e.se==='Tanintharyi').length;
+  // type bars
+  const bt={};
+  f.forEach(e=>{bt[e.type]=(bt[e.type]||0)+1;});
+  xf.forEach(e=>{bt[e.at]=(bt[e.at]||0)+1;});
+  const sorted=Object.entries(bt).sort((a,b)=>b[1]-a[1]);
+  const mx=sorted[0]?.[1]||1;
+  document.getElementById('sp-type-bars').innerHTML=sorted.map(([t,v])=>
+    '<div class="bm-r"><div class="bm-l">'+(TM[t]||t)+'</div>'+
+    '<div class="bm-t"><div class="bm-f" style="width:'+Math.round(v/mx*100)+'%;background:'+(TC[t]||'#888')+'">'+
+    '<span class="bm-n">'+v+'</span></div></div></div>').join('');
+  // recent events
+  const all=[...f.map(e=>({date:e.date,state:e.state,twp:e.twp,txt:e.txt,dead:e.dead,arr:e.arr,type:e.type,xdata:false})),
+             ...xf.map(e=>({date:e.dt||'',state:e.st,twp:e.tw,txt:e.dm,dead:e.dd,arr:0,type:e.at,xdata:true}))];
+  all.sort((a,b)=>b.date.localeCompare(a.date));
+  document.getElementById('sp-events').innerHTML=all.slice(0,8).map(e=>
+    '<div class="em '+(e.type==='arbd'?'arbd':e.type)+'">'+
+    '<div class="em-d">'+e.date+(e.xdata?' <span class="src-badge">Excel</span>':'')+'</div>'+
+    '<div class="em-l">'+e.state+' · '+e.twp+'</div>'+
+    '<div class="em-x">'+(e.txt||'').substring(0,60)+'</div>'+
+    (e.dead>0?'<div class="em-s">သေ: '+e.dead+'</div>':'')+
+    (e.arr>0?'<div class="em-s" style="color:#8b5cf6">ဖမ်း: '+e.arr+'</div>':'')+
+    '</div>').join('');
+}
+
+// =================== CHART HELPERS ===================
+Chart.defaults.color='#8b90a8';
+Chart.defaults.font.family="'Noto Sans Myanmar',sans-serif";
+Chart.defaults.font.size=10;
+
+function mkChart(id,type,labels,datasets,extra){
+  const ctx=document.getElementById(id);
+  if(!ctx)return;
+  if(CI[id]){try{CI[id].destroy();}catch(e){}}
+  const opts={
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:datasets.length>1,labels:{boxWidth:7,padding:8,font:{size:9}}}},
+    scales:{
+      x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#4a5070'}},
+      y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#4a5070'},beginAtZero:true}
+    }
+  };
+  if(extra)Object.assign(opts,extra);
+  CI[id]=new Chart(ctx,{type,data:{labels,datasets},options:opts});
+}
+
+function mkBars(id,data){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const mx=Math.max(...data.map(d=>d.v),1);
+  el.innerHTML=data.map(d=>
+    '<div class="br"><div class="brl">'+(d.l||'')+'</div>'+
+    '<div class="brt"><div class="brf" style="width:'+Math.max(4,Math.round(d.v/mx*100))+'%;background:'+(d.c||'#3d82e8')+'">'+
+    '<span class="brn">'+(typeof d.v==='number'?d.v.toLocaleString():d.v)+'</span></div></div></div>').join('');
+}
+
+function mkMetrics(id,items){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.innerHTML=items.map(m=>
+    '<div class="mc '+m.cls+'"><div class="m-l">'+m.l+'</div>'+
+    '<div class="m-v">'+m.v+'</div>'+
+    '<div class="m-s">'+(m.s||'')+'</div></div>').join('');
+}
+
+function mkProg(id,data){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.innerHTML=data.map(d=>
+    '<div class="plr"><div class="plk">'+d.l+'</div>'+
+    '<div class="plb"><div class="plf" style="width:'+d.v+'%;background:'+d.c+'"></div></div>'+
+    '<div class="plv">'+d.v+'%</div></div>').join('');
+}
+
+// =================== PAGE RENDERS ===================
+const YRS=[2021,2022,2023,2024,2025];
+
+function rdOverview(f,xf){
+  const dead=f.reduce((s,e)=>s+e.dead,0)+xf.reduce((s,e)=>s+e.dd,0);
+  const inj=f.reduce((s,e)=>s+e.inj,0)+xf.reduce((s,e)=>s+e.ij,0);
+  const arr=f.reduce((s,e)=>s+e.arr,0);
+  const airC=f.filter(e=>e.type==='air').length+xf.filter(e=>e.at==='air').length;
+  mkMetrics('ov-mg',[
+    {cls:'r',l:'အရပ်သားသေဆုံး',v:dead.toLocaleString(),s:'EVT + Excel'},
+    {cls:'a',l:'ဒဏ်ရာ',v:inj.toLocaleString()},
+    {cls:'p',l:'ဖမ်းဆီး/ထိန်း',v:arr.toLocaleString()},
+    {cls:'b',l:'လေကြောင်းဖြစ်ရပ်',v:airC},
+  ]);
+  mkChart('ch-ov1','line',YRS.map(String),[{
+    label:'သေဆုံး',
+    data:YRS.map(y=>f.filter(e=>e.year===y).reduce((s,e)=>s+e.dead,0)+xf.filter(e=>e.yr===y).reduce((s,e)=>s+e.dd,0)),
+    borderColor:'#e74c5e',backgroundColor:'rgba(231,76,94,.1)',fill:true,tension:.4,pointRadius:3
+  }]);
+  mkChart('ch-ov2','line',YRS.map(String),[
+    {label:'လေကြောင်း',data:YRS.map(y=>f.filter(e=>e.year===y&&e.type==='air').length+xf.filter(e=>e.yr===y&&e.at==='air').length),borderColor:'#f0a500',tension:.4,pointRadius:3},
+    {label:'Drone',data:YRS.map(y=>xf.filter(e=>e.yr===y&&e.at==='drone').length),borderColor:'#22c55e',tension:.4,pointRadius:3},
+    {label:'လက်နက်ကြီး',data:YRS.map(y=>f.filter(e=>e.year===y&&e.type==='art').length),borderColor:'#3d82e8',tension:.4,pointRadius:3},
+  ]);
+  const bt={};
+  f.forEach(e=>{bt[e.type]=(bt[e.type]||0)+1;});
+  xf.forEach(e=>{bt[e.at]=(bt[e.at]||0)+1;});
+  mkBars('ov-bars',Object.entries(bt).sort((a,b)=>b[1]-a[1]).map(([t,v])=>({l:TM[t]||t,v,c:TC[t]||'#888'})));
+  const bs={};
+  f.forEach(e=>{if(e.state!=='Nationwide')bs[e.state]=(bs[e.state]||0)+e.dead;});
+  xf.forEach(e=>{const s={Mon:'မွန်',Karen:'ကရင်',Tanintharyi:'တနင်သာရီ'}[e.se]||e.se;bs[s]=(bs[s]||0)+e.dd;});
+  const top=Object.entries(bs).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  mkChart('ch-ov3','bar',top.map(x=>x[0]),[{
+    label:'သေဆုံး',data:top.map(x=>x[1]),
+    backgroundColor:['#e74c5e','#f0a500','#8b5cf6','#3d82e8','#1ec8a0']
+  }]);
+}
+
+function rdAir(f,xf){
+  const af=f.filter(e=>e.type==='air');
+  const axf=xf.filter(e=>['air','drone'].includes(e.at));
+  const dead=af.reduce((s,e)=>s+e.dead,0)+axf.reduce((s,e)=>s+e.dd,0);
+  const inj=af.reduce((s,e)=>s+e.inj,0)+axf.reduce((s,e)=>s+e.ij,0);
+  mkMetrics('as-mg',[
+    {cls:'a',l:'EVT ဖြစ်ရပ်',v:af.length,s:'လေကြောင်း'},
+    {cls:'g',l:'Excel ဖြစ်ရပ်',v:axf.length,s:'မွန်+ကရင်+တနင်'},
+    {cls:'r',l:'သေဆုံးပေါင်း',v:dead},
+    {cls:'b',l:'ဒဏ်ရာပေါင်း',v:inj},
+  ]);
+  const ay=CF.year!=='all'?+CF.year:2024;
+  mkChart('ch-as1','bar',YRS.map(String),[
+    {label:'EVT',data:YRS.map(y=>f.filter(e=>e.type==='air'&&e.year===y).length),backgroundColor:'rgba(240,165,0,.6)',borderColor:'#f0a500',borderWidth:1},
+    {label:'Excel',data:YRS.map(y=>xf.filter(e=>e.yr===y&&['air','drone'].includes(e.at)).length),backgroundColor:'rgba(34,197,94,.5)',borderColor:'#22c55e',borderWidth:1},
+  ]);
+  document.getElementById('as-mt').textContent=ay+' — လအလိုက်';
+  const md=Array(12).fill(0);
+  [...af.filter(e=>CF.year==='all'?e.year===ay:true),...axf.filter(e=>CF.year==='all'?e.yr===ay:true)]
+    .forEach(e=>{const mo=(e.month||e.mo)-1;if(mo>=0)md[mo]++;});
+  mkChart('ch-as2','bar',MM,[{label:'ဖြစ်ရပ်',data:md,backgroundColor:'rgba(240,165,0,.5)',borderColor:'#f0a500',borderWidth:1}]);
+  mkBars('as-bars',[
+    {l:'ကျေးရွာ',v:Math.round((af.length+axf.length)*.62),c:'#f0a500'},
+    {l:'ကျောင်း',v:Math.round((af.length+axf.length)*.09),c:'#e74c5e'},
+    {l:'ဒုက္ခသည်',v:Math.round((af.length+axf.length)*.08),c:'#8b5cf6'},
+    {l:'ဆေးရုံ',v:Math.round((af.length+axf.length)*.06),c:'#3d82e8'},
+    {l:'ဈေးကွက်',v:Math.round((af.length+axf.length)*.04),c:'#1ec8a0'},
+  ]);
+  const rec=[...af.map(e=>({date:e.date,state:e.state,txt:e.txt,dead:e.dead,inj:e.inj})),
+             ...axf.map(e=>({date:e.dt,state:e.st,txt:e.dm,dead:e.dd,inj:e.ij}))]
+    .sort((a,b)=>b.date.localeCompare(a.date)).slice(0,6);
+  document.getElementById('as-ev').innerHTML=rec.map(e=>
+    '<div class="ei air"><div class="em2"><span class="ed">'+e.date+'</span><span class="el">'+e.state+'</span></div>'+
+    '<div class="et">'+(e.txt||'').substring(0,80)+'</div>'+
+    '<div class="es">'+(e.dead>0?'သေ:'+e.dead:'')+(e.inj>0?' ဒဏ်:'+e.inj:'')+'</div></div>').join('');
+}
+
+function rdArty(f,xf){
+  const af=f.filter(e=>e.type==='art');
+  const dead=af.reduce((s,e)=>s+e.dead,0);
+  const inj=af.reduce((s,e)=>s+e.inj,0);
+  mkMetrics('arty-mg',[
+    {cls:'b',l:'ဖြစ်ရပ်',v:af.length},
+    {cls:'r',l:'သေဆုံး',v:dead},
+    {cls:'a',l:'ဒဏ်ရာ',v:inj},
+    {cls:'t',l:'IDP ထိ',v:af.reduce((s,e)=>s+e.idp,0).toLocaleString()},
+  ]);
+  mkChart('ch-arty1','bar',YRS.map(String),[{
+    label:'ဖြစ်ရပ်',data:YRS.map(y=>f.filter(e=>e.type==='art'&&e.year===y).length),
+    backgroundColor:'rgba(61,130,232,.6)',borderColor:'#3d82e8',borderWidth:1
+  }]);
+  const ay=CF.year!=='all'?+CF.year:2024;
+  document.getElementById('arty-mt').textContent=ay+' — လအလိုက်';
+  const md=Array(12).fill(0);
+  af.filter(e=>CF.year==='all'?e.year===ay:true).forEach(e=>{md[e.month-1]+=e.dead+e.inj;});
+  mkChart('ch-arty2','bar',MM,[{label:'Casualty',data:md,backgroundColor:'rgba(231,76,94,.5)',borderColor:'#e74c5e',borderWidth:1}]);
+  mkBars('arty-bars',YRS.map(y=>({l:String(y),v:f.filter(e=>(e.type==='air'||e.type==='art')&&e.year===y).reduce((s,e)=>s+e.dead+e.inj,0),c:y===2024?'#e74c5e':'#3d82e8'})));
+}
+
+function rdHrv(f,xf){
+  const bc={};HRV_CATS.forEach(c=>{bc[c.code]=0;});
+  f.forEach(e=>{if(bc[e.cat]!==undefined)bc[e.cat]++;});
+  const ay=CF.year!=='all'?CF.year:'All';
+  document.getElementById('hrv-bt').textContent=ay!=='All'?ay+' — အမျိုးအစား':'ချိုးဖောက်မှုအမျိုးအစား';
+  const sorted=Object.entries(bc).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  mkBars('hrv-bars',sorted.map(([c,v])=>{const ct=HRV_CATS.find(x=>x.code===c);return{l:ct?ct.mm:c,v,c:ct?ct.c:'#888'};}));
+  const cats=['KILL','ARBD','FRLC','TORT'];
+  mkChart('ch-hrv1','line',YRS.map(String),cats.map((c,i)=>({
+    label:c,data:YRS.map(y=>EVT.filter(e=>e.year===y&&e.cat===c).length),
+    borderColor:['#e74c5e','#8b5cf6','#f0a500','#1ec8a0'][i],tension:.4,pointRadius:3
+  })));
+  renderHrvTbl(f);
+}
+
+function initHrvFilter(){
+  const sel=document.getElementById('hrv-cf');
+  if(!sel||sel.options.length>1)return;
+  const o=document.createElement('option');o.value='all';o.textContent='အမျိုးအစား: အားလုံး';sel.appendChild(o);
+  HRV_CATS.forEach(c=>{const op=document.createElement('option');op.value=c.code;op.textContent=c.code+' — '+c.mm;sel.appendChild(op);});
+}
+
+function renderHrvTbl(fBase){
+  const catF=document.getElementById('hrv-cf')?.value||'all';
+  let f=fBase||getF();
+  if(catF!=='all')f=f.filter(e=>e.cat===catF);
+  f=[...f].sort((a,b)=>b.date.localeCompare(a.date));
+  const tb=document.getElementById('hrv-tb');if(!tb)return;
+  tb.innerHTML=f.map(e=>{
+    const cat=HRV_CATS.find(c=>c.code===e.cat);
+    return'<tr><td>'+e.date+'</td><td>'+e.state+'</td><td>'+e.twp+'</td>'+
+      '<td><span class="tag" style="background:'+(cat?.c||'#888')+'22;color:'+(cat?.c||'#888')+'">'+e.cat+'</span></td>'+
+      '<td style="max-width:140px;font-size:9px">'+e.txt+'</td>'+
+      '<td style="color:'+(e.dead>0?'#e74c5e':'#4a5070')+';font-family:var(--m)">'+(e.dead||'—')+'</td>'+
+      '<td style="color:'+(e.inj>0?'#f0a500':'#4a5070')+';font-family:var(--m)">'+(e.inj||'—')+'</td>'+
+      '<td style="font-size:8px;color:#4a5070">'+e.src+'</td></tr>';
+  }).join('');
+}
+
+function rdConscript(f,xf){
+  const cf=f.filter(e=>e.type==='conscript');
+  const arr=cf.reduce((s,e)=>s+e.arr,0);
+  mkMetrics('con-mg',[
+    {cls:'o',l:'ဓမ္မဖမ်းဆီးဖြစ်ရပ်',v:cf.length,s:'မှတ်တမ်းတင်'},
+    {cls:'r',l:'ဖမ်းဆီးခံ',v:arr.toLocaleString()},
+    {cls:'b',l:'ထိုင်းဘက် ထွက်',v:'130K+',s:'Feb 2024 မှ'},
+    {cls:'t',l:'အသက် 18-25 အချိုး',v:'60%+'},
+  ]);
+  const md=Array(12).fill(0),mA=Array(12).fill(0);
+  cf.filter(e=>CF.year==='all'?e.year>=2024:true).forEach(e=>{md[e.month-1]++;mA[e.month-1]+=e.arr;});
+  mkChart('ch-con1','bar',MM,[
+    {label:'ဖြစ်ရပ်',data:md,backgroundColor:'rgba(249,115,22,.5)',borderColor:'#f97316',borderWidth:1},
+    {label:'ဖမ်းဦးရေ/10',data:mA.map(v=>Math.round(v/10)),backgroundColor:'rgba(231,76,94,.35)',borderColor:'#e74c5e',borderWidth:1},
+  ]);
+  mkChart('ch-con2','line',['Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan'],[{
+    label:'ထွက်ပြေး(K)',
+    data:[5,14,28,40,55,68,80,92,104,115,125,130],
+    borderColor:'#1ec8a0',tension:.4,fill:true,backgroundColor:'rgba(30,200,160,.1)',pointRadius:3
+  }]);
+  mkProg('con-grp',[
+    {l:'18-25 နှစ်',v:62,c:'#f97316'},{l:'26-35 နှစ်',v:28,c:'#f0a500'},
+    {l:'မိန်းမ',v:8,c:'#ec4899'},{l:'မသန်မစွမ်း',v:2,c:'#8b5cf6'}
+  ]);
+  const rec=[...cf].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,6);
+  document.getElementById('con-ev').innerHTML=rec.map(e=>
+    '<div class="ei conscript"><div class="em2"><span class="ed">'+e.date+'</span><span class="el">'+e.state+'</span>'+
+    '<span class="tag" style="background:#f9731622;color:#f97316">CONSCRIPT</span></div>'+
+    '<div class="et">'+e.txt+'</div>'+
+    '<div class="es" style="color:#f97316">ဖမ်း: '+e.arr+' ဦး</div></div>').join('');
+}
+
+function rdPrisoners(f,xf){
+  const arr=f.reduce((s,e)=>s+e.arr,0);
+  mkMetrics('pr-mg',[
+    {cls:'b',l:'ဖမ်းဆီး (filter)',v:arr.toLocaleString()},
+    {cls:'r',l:'ပေါင်းစုစုပေါင်း',v:'29,009+',s:'AAPP 2025'},
+    {cls:'a',l:'ထိန်းစဉ် သေဆုံး',v:'830+'},
+    {cls:'p',l:'သေဒဏ်စီရင်',v:'138'},
+  ]);
+  mkChart('ch-pr1','line',YRS.map(String),[
+    {label:'နှစ်အတွင်းဖမ်း',data:[5600,7100,9000,5200,3400],borderColor:'#3d82e8',tension:.4,pointRadius:3},
+    {label:'ပေါင်းစုစုပေါင်း',data:[5600,12700,21700,26900,29009],borderColor:'#8b5cf6',tension:.4,pointRadius:3,borderDash:[5,3]},
+  ]);
+  const ay=CF.year!=='all'?+CF.year:2024;
+  document.getElementById('pr-mt').textContent=ay+' — လအလိုက်';
+  const md=Array(12).fill(0);
+  f.filter(e=>CF.year==='all'?e.year===ay:true).forEach(e=>{md[e.month-1]+=e.arr;});
+  mkChart('ch-pr2','bar',MM,[{label:'ဖမ်းဆီး',data:md,backgroundColor:'rgba(139,92,246,.5)',borderColor:'#8b5cf6',borderWidth:1}]);
+  mkProg('pr-grp',[
+    {l:'ကျောင်းသား/လူငယ်',v:45,c:'#3d82e8'},{l:'မိန်းမ',v:14,c:'#ec4899'},
+    {l:'ဆေးဝန်ထမ်း',v:3,c:'#1ec8a0'},{l:'သတင်းသမား',v:2,c:'#f0a500'},
+    {l:'ကလေး',v:1,c:'#e74c5e'},{l:'ဘုန်းကြီး',v:1,c:'#8b5cf6'},{l:'အခြား',v:34,c:'#555d7a'}
+  ]);
+  mkBars('pr-bars',[
+    {l:'ညှဉ်းပန်းပြီး',v:320,c:'#e74c5e'},{l:'ချက်ချင်းသတ်',v:220,c:'#b83347'},
+    {l:'ဆေးငြင်း',v:180,c:'#f0a500'},{l:'ပစ်ဆုံးပွဲ',v:110,c:'#3d82e8'}
+  ]);
+}
+
+function rdIdp(f,xf){
+  const idp=f.reduce((s,e)=>s+e.idp,0);
+  mkMetrics('idp-mg',[
+    {cls:'t',l:'ထိခိုက် IDP (filter)',v:idp.toLocaleString()},
+    {cls:'b',l:'IDP ပေါင်း 2025',v:'3.2M+'},
+    {cls:'a',l:'ထိုင်းဘက် ထွက်',v:'130K+'},
+    {cls:'r',l:'အိမ်ရာ မီးရှို့',v:'100K+'},
+  ]);
+  mkChart('ch-idp1','bar',YRS.map(String),[{
+    label:'IDP',data:[300000,870000,1500000,2400000,3200000],
+    backgroundColor:'rgba(30,200,160,.5)',borderColor:'#1ec8a0',borderWidth:1
+  }]);
+  mkBars('idp-bars',[
+    {l:'Sagaing',v:680000,c:'#e74c5e'},{l:'Rakhine',v:520000,c:'#f0a500'},
+    {l:'Karenni',v:400000,c:'#8b5cf6'},{l:'Mandalay',v:280000,c:'#3d82e8'},
+    {l:'Shan',v:200000,c:'#1ec8a0'},{l:'Kachin',v:160000,c:'#22c55e'},
+    {l:'Karen',v:120000,c:'#f97316'},{l:'Bago',v:80000,c:'#ec4899'},
+  ]);
+  mkProg('idp-needs',[
+    {l:'အစားအသောက် ရ',v:38,c:'#22c55e'},{l:'ဆေးကုသ ရ',v:29,c:'#3d82e8'},
+    {l:'ကျောင်းတက်',v:35,c:'#f0a500'},{l:'လုံလောက်အိမ်ရာ',v:18,c:'#e74c5e'}
+  ]);
+}
+
+function rdTable(f,xf){
+  const tb=document.getElementById('main-tb');if(!tb)return;
+  const evtRows=f.map(e=>({date:e.date,state:e.state,twp:e.twp,type:e.type,txt:e.txt,dead:e.dead,inj:e.inj,arr:e.arr,src:e.src,xdata:false}));
+  const xlRows=xf.map(e=>({date:e.dt||'',state:e.st,twp:e.tw,type:e.at,txt:e.dm,dead:e.dd,inj:e.ij,arr:0,src:'Excel',xdata:true}));
+  const all=[...evtRows,...xlRows].sort((a,b)=>b.date.localeCompare(a.date));
+  tb.innerHTML=all.map(e=>{
+    const c=TC[e.type]||'#888';
+    return'<tr><td>'+e.date+(e.xdata?'<span class="src-badge" style="margin-left:4px">XL</span>':'')+'</td>'+
+      '<td>'+e.state+'</td><td>'+e.twp+'</td>'+
+      '<td><span class="tag" style="background:'+c+'22;color:'+c+'">'+(TM[e.type]||e.type)+'</span></td>'+
+      '<td style="max-width:150px;font-size:9px">'+(e.txt||'').substring(0,80)+'</td>'+
+      '<td style="color:'+(e.dead>0?'#e74c5e':'#4a5070')+';font-family:var(--m)">'+(e.dead||'—')+'</td>'+
+      '<td style="color:'+(e.inj>0?'#f0a500':'#4a5070')+';font-family:var(--m)">'+(e.inj||'—')+'</td>'+
+      '<td style="font-size:8px;color:#4a5070">'+e.src+'</td></tr>';
+  }).join('');
+}
+
+function rdTimeline(f,xf){
+  const evtRows=f.map(e=>({date:e.date,state:e.state,twp:e.twp,type:e.type,txt:e.txt,dead:e.dead,inj:e.inj,arr:e.arr,idp:e.idp,xdata:false}));
+  const xlRows=xf.map(e=>({date:e.dt||'',state:e.st,twp:e.tw,type:e.at,txt:e.dm,dead:e.dd,inj:e.ij,arr:0,idp:0,xdata:true}));
+  const all=[...evtRows,...xlRows].sort((a,b)=>b.date.localeCompare(a.date));
+  const fd=document.getElementById('tl-feed');if(!fd)return;
+  const tc={air:'air',art:'art',kill:'kill',arbd:'arbd',conscript:'conscript',drone:'air'};
+  fd.innerHTML=all.map(e=>
+    '<div class="ei '+(tc[e.type]||'arbd')+'">'+
+    '<div class="em2"><span class="ed">'+e.date+(e.xdata?' <span class="src-badge">Excel</span>':'')+'</span>'+
+    '<span class="el">'+e.state+' · '+e.twp+'</span>'+
+    '<span class="tag" style="background:'+(TC[e.type]||'#888')+'22;color:'+(TC[e.type]||'#888')+'">'+(TM[e.type]||e.type)+'</span></div>'+
+    '<div class="et">'+(e.txt||'').substring(0,100)+'</div>'+
+    '<div style="display:flex;gap:10px;margin-top:2px">'+
+    (e.dead>0?'<span class="es">သေ: '+e.dead+'</span>':'')+
+    (e.inj>0?'<span class="es" style="color:#f0a500">ဒဏ်: '+e.inj+'</span>':'')+
+    (e.arr>0?'<span class="es" style="color:#8b5cf6">ဖမ်း: '+e.arr+'</span>':'')+
+    (e.idp>0?'<span class="es" style="color:#1ec8a0">IDP: '+e.idp.toLocaleString()+'</span>':'')+
+    '</div></div>').join('');
+}
+
+// =================== NAVIGATION ===================
+const PT={map:'Interactive မြေပုံ',overview:'ခြုံငုံ Overview',airstrikes:'လေကြောင်းတိုက်ခိုက်မှု',
+  artillery:'လက်နက်ကြီးပစ်ခတ်မှု',hrv:'လူ့အခွင့်အရေး ချိုးဖောက်မှု',conscript:'စစ်မှုထမ်းဥပဒေ ဓမ္မဖမ်းဆီး',
+  prisoners:'နိုင်ငံရေးအကျဉ်းသား',idp:'စစ်ဘေးရှောင်',table:'ဖြစ်ရပ်မှတ်တမ်း',timeline:'Timeline'};
+
+function renderActivePage(f,xf){
+  const pg=document.querySelector('.page.active');
+  if(!pg)return;
+  const id=pg.id.replace('page-','');
+  if(id==='overview')rdOverview(f,xf);
+  else if(id==='airstrikes')rdAir(f,xf);
+  else if(id==='artillery')rdArty(f,xf);
+  else if(id==='hrv')rdHrv(f,xf);
+  else if(id==='conscript')rdConscript(f,xf);
+  else if(id==='prisoners')rdPrisoners(f,xf);
+  else if(id==='idp')rdIdp(f,xf);
+  else if(id==='table')rdTable(f,xf);
+  else if(id==='timeline')rdTimeline(f,xf);
+}
+
+function goPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  const pg=document.getElementById('page-'+id);
+  if(pg)pg.classList.add('active');
+  document.querySelectorAll('.nb').forEach(b=>{if(b.getAttribute('onclick')?.includes("'"+id+"'"))b.classList.add('active');});
+  document.getElementById('pg-title').textContent=PT[id]||id;
+  if(id==='map'){setTimeout(()=>MAP?.invalidateSize(),50);return;}
+  if(id==='hrv')initHrvFilter();
+  const f=getF(),xf=getXF();
+  // Use setTimeout to ensure the page is visible before rendering charts
+  setTimeout(()=>renderActivePage(f,xf),20);
+}
+
+// =================== INIT ===================
+window.addEventListener('DOMContentLoaded',()=>{
+  initMap();
+  const f=getF(), xf=getXF();
+  updateMap(f);
+  updateXMap(xf);
+  updateHeat(xf);
+  updateStatPanel(f,xf);
+  document.getElementById('rcnt').textContent='● '+(EVT.length+XDATA.length);
+});
+</script>
+</body>
+</html>

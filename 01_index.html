@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="မြန်မာနိုင်ငံ လူ့အခွင့်အရေး မှတ်တမ်း — ၂၀၂၁ မှ ယနေ့ထိ">
+<meta property="og:title" content="မြန်မာ လူ့အခွင့်အရေး မှတ်တမ်း">
+<meta property="og:description" content="SAC တပ်မတော်မှ ကျူးလွန်သော လူ့အခွင့်အရေးချိုးဖောက်မှုများ မှတ်တမ်း">
+<meta property="og:image" content="assets/og-image.png">
+<title>မြန်မာ လူ့အခွင့်အရေး မှတ်တမ်း</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+  import { getDatabase, ref, onValue, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+  // ⚠️  Firebase config ကို firebase-config.js ထဲ ထည့်ပါ (admin setup guide ကြည့်ပါ)
+  import { FIREBASE_CONFIG } from './firebase-config.js';
+  const app = initializeApp(FIREBASE_CONFIG);
+  const db = getDatabase(app);
+  window.__db = db;
+  window.__dbRef = ref;
+  window.__onValue = onValue;
+  window.__query = query;
+  window.__orderByChild = orderByChild;
+  window.__limitToLast = limitToLast;
+  window.__firebaseReady = true;
+  document.dispatchEvent(new Event('firebase-ready'));
+</script>
+<style>
+:root {
+  --bg: #05080f;
+  --bg2: #0c111d;
+  --bg3: #141b2d;
+  --card: #192035;
+  --brd: rgba(255,255,255,0.06);
+  --brd2: rgba(255,255,255,0.11);
+  --tx: #e2e6f0;
+  --tx2: #7c849a;
+  --tx3: #3d4460;
+  --red: #e84054;
+  --amb: #f0a300;
+  --blu: #3b80e8;
+  --tel: #18c49c;
+  --pur: #8855f5;
+  --grn: #22c25a;
+  --f: 'Noto Sans Myanmar', sans-serif;
+  --m: 'IBM Plex Mono', monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:var(--f);font-size:14px;line-height:1.7;min-height:100vh}
+a{color:inherit;text-decoration:none}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--brd2);border-radius:2px}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(5,8,15,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--brd);padding:0 24px;display:flex;align-items:center;height:54px;gap:20px}
+.nav-logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:14px}
+.flag-strip{display:flex;gap:2px}
+.flag-strip span{width:4px;height:18px;border-radius:1px}
+.nav-links{display:flex;gap:4px;margin-left:auto}
+.nav-link{padding:5px 12px;border-radius:5px;font-size:12px;color:var(--tx2);transition:.15s;cursor:pointer}
+.nav-link:hover{background:rgba(255,255,255,.06);color:var(--tx)}
+.nav-link.active{color:var(--red)}
+.nav-btn{background:rgba(232,64,84,.15);color:var(--red);border:1px solid rgba(232,64,84,.3);padding:5px 14px;border-radius:5px;font-size:12px;font-family:var(--f);cursor:pointer;transition:.15s}
+.nav-btn:hover{background:rgba(232,64,84,.25)}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--red);animation:pulse 2s infinite;display:inline-block;margin-right:5px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* HERO */
+.hero{padding:80px 24px 60px;max-width:960px;margin:0 auto;text-align:center}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(232,64,84,.1);border:1px solid rgba(232,64,84,.2);color:var(--red);padding:4px 12px;border-radius:20px;font-size:11px;font-family:var(--m);margin-bottom:24px}
+.hero h1{font-size:clamp(26px,5vw,44px);font-weight:700;line-height:1.25;margin-bottom:16px}
+.hero h1 span{color:var(--red)}
+.hero-sub{font-size:15px;color:var(--tx2);max-width:560px;margin:0 auto 36px;line-height:1.8}
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:700px;margin:0 auto}
+.hstat{background:var(--card);border:1px solid var(--brd);border-radius:10px;padding:16px;text-align:center}
+.hstat-n{font-size:28px;font-weight:700;font-family:var(--m);line-height:1}
+.hstat-l{font-size:10px;color:var(--tx2);margin-top:4px}
+
+/* SECTIONS */
+section{max-width:960px;margin:0 auto;padding:48px 24px}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.sec-title{font-size:18px;font-weight:600}
+.sec-title span{color:var(--red)}
+.sec-more{font-size:11px;color:var(--tx2);cursor:pointer;padding:4px 10px;border:1px solid var(--brd2);border-radius:4px;transition:.15s;font-family:var(--m)}
+.sec-more:hover{color:var(--tx);border-color:var(--brd2)}
+
+/* NEWS GRID */
+.news-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.news-card{background:var(--card);border:1px solid var(--brd);border-radius:10px;overflow:hidden;cursor:pointer;transition:.2s}
+.news-card:hover{border-color:var(--brd2);transform:translateY(-2px)}
+.news-card.featured{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:0}
+.nc-img{height:160px;background:var(--bg3);position:relative;overflow:hidden}
+.news-card.featured .nc-img{height:100%;min-height:200px}
+.nc-img img{width:100%;height:100%;object-fit:cover;opacity:.8}
+.nc-img-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:36px}
+.nc-type{position:absolute;top:10px;left:10px;font-size:9px;font-family:var(--m);padding:3px 8px;border-radius:4px;font-weight:600}
+.nc-body{padding:14px}
+.nc-date{font-size:9px;color:var(--tx3);font-family:var(--m);margin-bottom:6px}
+.nc-title{font-size:13px;font-weight:600;line-height:1.4;margin-bottom:6px;color:var(--tx)}
+.nc-text{font-size:11px;color:var(--tx2);line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.nc-footer{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--brd)}
+.nc-loc{font-size:10px;color:var(--blu)}
+.nc-stat{font-size:10px;font-family:var(--m)}
+
+/* TICKER */
+.ticker-wrap{background:var(--bg2);border-top:1px solid var(--brd);border-bottom:1px solid var(--brd);padding:8px 0;overflow:hidden}
+.ticker{display:flex;gap:40px;animation:ticker 30s linear infinite;white-space:nowrap}
+.ticker:hover{animation-play-state:paused}
+.ticker-item{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--tx2)}
+.ticker-item strong{color:var(--red)}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* STATS SECTION */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.stat-card{background:var(--card);border:1px solid var(--brd);border-radius:10px;padding:18px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat-card.r::before{background:var(--red)}.stat-card.a::before{background:var(--amb)}
+.stat-card.b::before{background:var(--blu)}.stat-card.t::before{background:var(--tel)}
+.stat-card.p::before{background:var(--pur)}.stat-card.g::before{background:var(--grn)}
+.sc-label{font-size:10px;color:var(--tx3);margin-bottom:6px}
+.sc-num{font-size:32px;font-weight:700;font-family:var(--m);line-height:1}
+.sc-sub{font-size:10px;color:var(--tx2);margin-top:4px}
+.sc-bar{height:3px;background:rgba(255,255,255,.06);border-radius:2px;margin-top:12px;overflow:hidden}
+.sc-fill{height:100%;border-radius:2px;transition:width 1.5s ease}
+
+/* CHART SECTION */
+.chart-row{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+.chart-card{background:var(--card);border:1px solid var(--brd);border-radius:10px;padding:18px}
+.chart-title{font-size:12px;font-weight:600;color:var(--tx2);margin-bottom:14px}
+.chart-wrap{position:relative}
+
+/* REGION TABLE */
+.reg-table{width:100%;border-collapse:collapse}
+.reg-table th{font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;padding:6px 10px;text-align:left;border-bottom:1px solid var(--brd2)}
+.reg-table td{padding:8px 10px;border-bottom:1px solid var(--brd);font-size:11px;color:var(--tx2)}
+.reg-table tr:hover td{background:rgba(255,255,255,.02)}
+.reg-table td:first-child{font-weight:600;color:var(--tx)}
+.reg-bar{height:4px;background:rgba(255,255,255,.06);border-radius:2px;margin-top:3px}
+.reg-fill{height:100%;border-radius:2px}
+
+/* EVENT FEED */
+.event-feed{display:flex;flex-direction:column;gap:10px}
+.ev{background:var(--card);border:1px solid var(--brd);border-radius:8px;padding:14px;display:flex;gap:14px;cursor:pointer;transition:.15s;border-left:3px solid transparent}
+.ev:hover{border-color:var(--brd2);transform:translateX(3px)}
+.ev.kill{border-left-color:var(--red)}.ev.air{border-left-color:var(--amb)}
+.ev.art{border-left-color:var(--blu)}.ev.arbd{border-left-color:var(--pur)}
+.ev.conscript{border-left-color:var(--orn,#f97316)}.ev.drone{border-left-color:var(--grn)}
+.ev-date{font-size:9px;font-family:var(--m);color:var(--tx3);min-width:80px;padding-top:2px}
+.ev-body{flex:1}
+.ev-title{font-size:12px;font-weight:600;color:var(--tx);margin-bottom:3px}
+.ev-text{font-size:11px;color:var(--tx2);line-height:1.5}
+.ev-footer{display:flex;gap:10px;margin-top:6px;flex-wrap:wrap}
+.ev-tag{font-size:9px;font-family:var(--m);padding:2px 6px;border-radius:3px}
+.ev-dead{font-size:10px;font-family:var(--m);color:var(--red)}
+.ev-inj{font-size:10px;font-family:var(--m);color:var(--amb)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:.2s}
+.modal-overlay.open{opacity:1;pointer-events:auto}
+.modal{background:var(--bg2);border:1px solid var(--brd2);border-radius:14px;max-width:600px;width:100%;max-height:80vh;overflow-y:auto;padding:28px}
+.modal-close{float:right;background:none;border:none;color:var(--tx2);font-size:20px;cursor:pointer;padding:0 4px}
+.modal h2{font-size:18px;font-weight:700;margin-bottom:6px}
+.modal-meta{font-size:10px;color:var(--tx3);font-family:var(--m);margin-bottom:16px}
+.modal-body{font-size:13px;color:var(--tx2);line-height:1.9}
+.modal-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0;padding:14px;background:var(--bg3);border-radius:8px}
+.ms-item{text-align:center}
+.ms-num{font-size:20px;font-weight:700;font-family:var(--m)}
+.ms-label{font-size:9px;color:var(--tx3)}
+
+/* SEARCH */
+.search-bar{background:var(--bg2);border:1px solid var(--brd2);padding:18px 24px;position:sticky;top:54px;z-index:90}
+.search-inner{max-width:960px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.search-input{flex:1;background:var(--card);border:1px solid var(--brd2);color:var(--tx);padding:8px 14px;border-radius:6px;font-family:var(--f);font-size:13px;outline:none}
+.search-input:focus{border-color:var(--blu)}
+.search-input::placeholder{color:var(--tx3)}
+.filter-chip{padding:6px 12px;border:1px solid var(--brd2);border-radius:20px;font-size:11px;color:var(--tx2);cursor:pointer;transition:.12s;background:transparent;font-family:var(--f)}
+.filter-chip:hover,.filter-chip.on{background:rgba(232,64,84,.15);border-color:rgba(232,64,84,.3);color:var(--red)}
+
+/* FOOTER */
+footer{background:var(--bg2);border-top:1px solid var(--brd);padding:32px 24px;text-align:center}
+.footer-inner{max-width:960px;margin:0 auto}
+.footer-logo{font-size:16px;font-weight:700;margin-bottom:8px}
+.footer-sub{font-size:11px;color:var(--tx3);margin-bottom:16px}
+.footer-links{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;font-size:11px;color:var(--tx2);margin-bottom:16px}
+.footer-src{font-size:10px;color:var(--tx3);line-height:1.8}
+.footer-disclaimer{margin-top:16px;padding-top:16px;border-top:1px solid var(--brd);font-size:10px;color:var(--tx3);max-width:600px;margin-left:auto;margin-right:auto}
+
+@media(max-width:700px){
+  .hero-stats{grid-template-columns:repeat(2,1fr)}
+  .news-grid{grid-template-columns:1fr}
+  .news-card.featured{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .chart-row{grid-template-columns:1fr}
+  .nav-links{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="flag-strip">
+      <span style="background:#FECB00"></span>
+      <span style="background:#34A853"></span>
+      <span style="background:#EA4335"></span>
+    </div>
+    မြန်မာ လူ့အခွင့်အရေး မှတ်တမ်း
+  </div>
+  <div class="nav-links">
+    <div class="nav-link active" onclick="scrollTo('#news')">သတင်း</div>
+    <div class="nav-link" onclick="scrollTo('#stats')">စာရင်းဇယား</div>
+    <div class="nav-link" onclick="scrollTo('#events')">ဖြစ်ရပ်များ</div>
+    <div class="nav-link" onclick="scrollTo('#about')">အကြောင်း</div>
+  </div>
+  <button class="nav-btn" onclick="location.href='dashboard.html'">📊 Dashboard</button>
+</nav>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker" id="ticker">
+    <span class="ticker-item"><strong>●</strong> ဒေတာ ဆွဲယူနေသည်...</span>
+    <span class="ticker-item"><strong>●</strong> ဒေတာ ဆွဲယူနေသည်...</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge"><span class="live-dot"></span>Live မှတ်တမ်း — <span id="last-update">ဆွဲယူနေသည်</span></div>
+  <h1>SAC တပ်မတော်၏<br><span>လူ့အခွင့်အရေး ချိုးဖောက်မှုများ</span><br>မှတ်တမ်း ၂၀၂၁–ယနေ့</h1>
+  <p class="hero-sub">ဤ website သည် မြန်မာနိုင်ငံတွင် ၂၀၂၁ ဖေဖော်ဝါရီ စစ်အာဏာသိမ်းမှုနောက်ပိုင်း ကျူးလွန်ထားသော လေကြောင်းတိုက်ခိုက်မှု၊ လက်နက်ကြီးပစ်ခတ်မှုနှင့် လူ့အခွင့်အရေးချိုးဖောက်မှုများကို မှတ်တမ်းတင်သည်</p>
+  <div class="hero-stats">
+    <div class="hstat"><div class="hstat-n" style="color:var(--red)" id="h-dead">—</div><div class="hstat-l">အရပ်သားသေဆုံး</div></div>
+    <div class="hstat"><div class="hstat-n" style="color:var(--amb)" id="h-inj">—</div><div class="hstat-l">ဒဏ်ရာ</div></div>
+    <div class="hstat"><div class="hstat-n" style="color:var(--pur)" id="h-arr">—</div><div class="hstat-l">နိုင်ငံရေးအကျဉ်း</div></div>
+    <div class="hstat"><div class="hstat-n" style="color:var(--tel)" id="h-idp">—</div><div class="hstat-l">IDP ဒုက္ခသည်</div></div>
+  </div>
+</div>
+
+<!-- SEARCH BAR -->
+<div class="search-bar">
+  <div class="search-inner">
+    <input class="search-input" id="search-input" placeholder="ဖြစ်ရပ်၊ ဒေသ၊ ရက်စွဲ ရှာရန်..." oninput="filterEvents()">
+    <button class="filter-chip" data-type="air" onclick="toggleType(this)">✈ လေကြောင်း</button>
+    <button class="filter-chip" data-type="art" onclick="toggleType(this)">💥 လက်နက်ကြီး</button>
+    <button class="filter-chip" data-type="arbd" onclick="toggleType(this)">🔒 ဖမ်းဆီး</button>
+    <button class="filter-chip" data-type="drone" onclick="toggleType(this)">🚁 Drone</button>
+  </div>
+</div>
+
+<!-- NEWS -->
+<section id="news">
+  <div class="sec-head">
+    <div class="sec-title">နောက်ဆုံး <span>သတင်းများ</span></div>
+    <div class="sec-more" onclick="loadMoreNews()">ထပ်ကြည့် →</div>
+  </div>
+  <div class="news-grid" id="news-grid">
+    <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--tx3);font-family:var(--m)">ဒေတာ ဆွဲယူနေသည်...</div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section id="stats">
+  <div class="sec-head">
+    <div class="sec-title">စာရင်း<span>ဇယားများ</span></div>
+  </div>
+  <div class="stats-grid" id="stats-grid">
+    <div class="stat-card r"><div class="sc-label">စုစုပေါင်း သေဆုံး</div><div class="sc-num" id="s-dead">—</div><div class="sc-sub">UN OHCHR မှတ်တမ်း</div><div class="sc-bar"><div class="sc-fill" style="background:var(--red);width:0%" id="sb-dead"></div></div></div>
+    <div class="stat-card a"><div class="sc-label">ဒဏ်ရာ</div><div class="sc-num" id="s-inj">—</div><div class="sc-sub">documented cases</div><div class="sc-bar"><div class="sc-fill" style="background:var(--amb);width:0%" id="sb-inj"></div></div></div>
+    <div class="stat-card b"><div class="sc-label">လေကြောင်းဖြစ်ရပ်</div><div class="sc-num" id="s-air">—</div><div class="sc-sub">ACLED မှတ်တမ်း</div><div class="sc-bar"><div class="sc-fill" style="background:var(--blu);width:0%" id="sb-air"></div></div></div>
+    <div class="stat-card p"><div class="sc-label">နိုင်ငံရေးအကျဉ်းသား</div><div class="sc-num" id="s-arr">—</div><div class="sc-sub">AAPP 2025</div><div class="sc-bar"><div class="sc-fill" style="background:var(--pur);width:100%"></div></div></div>
+    <div class="stat-card t"><div class="sc-label">IDP ဒုက္ခသည်</div><div class="sc-num" id="s-idp">—</div><div class="sc-sub">OCHA 2025</div><div class="sc-bar"><div class="sc-fill" style="background:var(--tel);width:0%" id="sb-idp"></div></div></div>
+    <div class="stat-card g"><div class="sc-label">ဖြစ်ရပ်မှတ်တမ်းပေါင်း</div><div class="sc-num" id="s-total">—</div><div class="sc-sub">ဤ database ထဲ</div><div class="sc-bar"><div class="sc-fill" style="background:var(--grn);width:100%"></div></div></div>
+  </div>
+
+  <!-- Chart + Region Table -->
+  <div class="chart-row" style="margin-top:14px">
+    <div class="chart-card">
+      <div class="chart-title">နှစ်အလိုက် ဖြစ်ရပ်ပေါင်း</div>
+      <div class="chart-wrap" style="height:200px"><canvas id="ch-yearly"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">ဒေသ Top 6</div>
+      <div style="overflow:auto;max-height:210px">
+        <table class="reg-table" id="reg-table">
+          <thead><tr><th>ဒေသ</th><th>ဖြစ်ရပ်</th><th>သေ</th></tr></thead>
+          <tbody id="reg-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EVENTS FEED -->
+<section id="events">
+  <div class="sec-head">
+    <div class="sec-title">ဖြစ်ရပ်<span>မှတ်တမ်းများ</span></div>
+    <div class="sec-more" onclick="loadMoreEvents()">ထပ်ကြည့် →</div>
+  </div>
+  <div class="event-feed" id="event-feed">
+    <div style="text-align:center;padding:40px;color:var(--tx3);font-family:var(--m)">ဒေတာ ဆွဲယူနေသည်...</div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="chart-card">
+    <div class="chart-title" style="font-size:16px;color:var(--tx)">ဤ Website အကြောင်း</div>
+    <div style="color:var(--tx2);font-size:13px;line-height:2;margin-top:12px">
+      ဤ website သည် မြန်မာနိုင်ငံတွင် စစ်အာဏာသိမ်းမှုနောက်ပိုင်း ကျူးလွန်ထားသော လူ့အခွင့်အရေးချိုးဖောက်မှုများကို မှတ်တမ်းတင်ရန် ဖန်တီးထားသည်။
+      <br><br>
+      <strong style="color:var(--tx)">ဒေတာ ရင်းမြစ်များ:</strong> AAPP (Assistance Association for Political Prisoners) · ACLED · UN OHCHR · Human Rights Watch · Radio Free Asia · Fortify Rights · EW Monitor
+      <br><br>
+      <strong style="color:var(--tx)">မူဝါဒ:</strong> ဒေတာများသည် မှတ်တမ်းတင်ထားသည်ထက် အမှန်တကယ် ပိုများနိုင်ပါသည်။ ဖြစ်ရပ်အသစ်များ မည်သည့်အချိန်တွင်မဆို update ဖြစ်နိုင်သည်။
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">မြန်မာ လူ့အခွင့်အရေး မှတ်တမ်း</div>
+    <div class="footer-sub">Myanmar Human Rights Documentation Project</div>
+    <div class="footer-links">
+      <span onclick="location.href='dashboard.html'" style="cursor:pointer">📊 Dashboard</span>
+      <span onclick="location.href='admin.html'" style="cursor:pointer">🔒 Admin</span>
+    </div>
+    <div class="footer-src">ရင်းမြစ်: AAPP · ACLED · UN OHCHR · HRW · RFA · Fortify Rights · EW Monitor</div>
+    <div class="footer-disclaimer">ဤ website သည် documentation purpose ဖြင့်သာ ဆောက်လုပ်ထားသော်လည်း ဒေတာများ မပြည့်မစုံဖြစ်နိုင်ပြီး အမှားများ ပါဝင်နိုင်သည်ကို သတိပြုပါ။</div>
+  </div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+// =================== STATIC FALLBACK DATA ===================
+// Firebase မ connect မဖြစ်သေးသောကြောင့် static data ဖြင့် ပြသမည်
+const STATIC_STATS = {
+  dead: 6764, inj: 8900, air: 2268, arr: 29009, idp: 3200000, total: 47200
+};
+const STATIC_YEARLY = {
+  labels:['2021','2022','2023','2024','2025'],
+  air:[80,159,253,776,900], art:[120,280,410,890,1100], dead:[380,540,760,1769,1200]
+};
+const STATIC_REGIONS = [
+  {name:'Sagaing',events:680,dead:340},{name:'Rakhine',events:520,dead:280},
+  {name:'Karenni',events:390,dead:195},{name:'Mandalay',events:310,dead:160},
+  {name:'မွန်',events:148,dead:85},{name:'Kachin',events:280,dead:140},
+];
+
+// =================== INITIAL RENDER ===================
+let allEvents = [];
+let activeTypes = new Set();
+let eventsPage = 1;
+const PAGE_SIZE = 10;
+
+const TC = {air:'#f0a300',art:'#3b80e8',kill:'#e84054',arbd:'#8855f5',conscript:'#f97316',drone:'#22c25a',idp:'#18c49c'};
+const TM = {air:'လေကြောင်း',art:'လက်နက်ကြီး',kill:'သတ်ဖြတ်',arbd:'မတရားဖမ်း',conscript:'စစ်မှုထမ်းဖမ်း',drone:'Drone',idp:'ဒုက္ခသည်'};
+
+function fmt(n){if(n>=1000000)return(n/1000000).toFixed(1)+'M';if(n>=1000)return(n/1000).toFixed(n>=10000?0:1)+'K';return n.toLocaleString();}
+
+function initStatic(){
+  // Hero stats
+  animNum('h-dead', STATIC_STATS.dead, 'var(--red)');
+  animNum('h-inj', STATIC_STATS.inj, 'var(--amb)');
+  animNum('h-arr', STATIC_STATS.arr, 'var(--pur)');
+  const idpEl = document.getElementById('h-idp');
+  if(idpEl){idpEl.textContent='3.2M+';idpEl.style.color='var(--tel)';}
+  // Stat cards
+  document.getElementById('s-dead').textContent = fmt(STATIC_STATS.dead)+'+';
+  document.getElementById('s-inj').textContent = fmt(STATIC_STATS.inj)+'+';
+  document.getElementById('s-air').textContent = fmt(STATIC_STATS.air);
+  document.getElementById('s-arr').textContent = fmt(STATIC_STATS.arr)+'+';
+  document.getElementById('s-idp').textContent = '3.2M+';
+  document.getElementById('s-total').textContent = fmt(STATIC_STATS.total)+'+';
+  // Progress bars animate
+  setTimeout(()=>{
+    document.getElementById('sb-dead').style.width='85%';
+    document.getElementById('sb-inj').style.width='72%';
+    document.getElementById('sb-air').style.width='60%';
+    document.getElementById('sb-idp').style.width='95%';
+  },300);
+  // Yearly chart
+  initYearlyChart();
+  // Region table
+  renderRegionTable();
+  // Last update
+  document.getElementById('last-update').textContent = new Date().toLocaleDateString('my-MM',{year:'numeric',month:'long',day:'numeric'});
+}
+
+function animNum(id, target, color){
+  const el = document.getElementById(id);
+  if(!el)return;
+  el.style.color = color;
+  let start = 0;
+  const step = Math.ceil(target/60);
+  const timer = setInterval(()=>{
+    start = Math.min(start+step, target);
+    el.textContent = fmt(start)+(start===target?'+':'');
+    if(start>=target)clearInterval(timer);
+  },30);
+}
+
+let yearlyChart = null;
+function initYearlyChart(){
+  const ctx = document.getElementById('ch-yearly');
+  if(!ctx)return;
+  Chart.defaults.color='#7c849a';
+  Chart.defaults.font.family="'Noto Sans Myanmar',sans-serif";
+  yearlyChart = new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:STATIC_YEARLY.labels,
+      datasets:[
+        {label:'လေကြောင်း',data:STATIC_YEARLY.air,backgroundColor:'rgba(240,163,0,.65)',borderColor:'#f0a300',borderWidth:1},
+        {label:'လက်နက်ကြီး',data:STATIC_YEARLY.art,backgroundColor:'rgba(59,128,232,.5)',borderColor:'#3b80e8',borderWidth:1},
+        {label:'သေဆုံး',data:STATIC_YEARLY.dead,type:'line',borderColor:'#e84054',pointRadius:4,tension:.4,yAxisID:'y2',fill:false},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{boxWidth:8,padding:10,font:{size:10}}}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#3d4460'}},
+        y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#3d4460'},beginAtZero:true},
+        y2:{position:'right',grid:{display:false},ticks:{color:'#e84054'},beginAtZero:true}
+      }
+    }
+  });
+}
+
+function renderRegionTable(){
+  const tbody = document.getElementById('reg-tbody');
+  if(!tbody)return;
+  const max = STATIC_REGIONS[0].events;
+  tbody.innerHTML = STATIC_REGIONS.map(r=>`
+    <tr><td>${r.name}<div class="reg-bar"><div class="reg-fill" style="width:${Math.round(r.events/max*100)}%;background:var(--red)"></div></div></td>
+    <td style="font-family:var(--m)">${r.events}</td>
+    <td style="color:var(--red);font-family:var(--m)">${r.dead}</td></tr>`).join('');
+}
+
+// =================== EVENTS ===================
+const SAMPLE_EVENTS = [
+  {id:'e1',date:'2025-10-06',year:2025,type:'air',state:'Sagaing',twp:'Chaung-U',title:'ဘုရားပွဲ Paramotor ဗုံးချ',body:'Chaung-U မြို့နယ် ဘုရားပွဲ တက်ရောက်သူများကို Paramotor ဖြင့် 120mm mortar ကျည်သယ်ဆောင်ကာ ချမှတ်တိုက်ခိုက်ခဲ့သည်။ ကလေး 3 ဦးအပါ 24 ဦး သေဆုံးကာ 12 ဦး ဒဏ်ရာရသည်',dead:24,inj:12,src:'RFA'},
+  {id:'e2',date:'2025-09-12',year:2025,type:'air',state:'Rakhine',twp:'Kyauktaw',title:'ကျောင်း 2 ခုကို ညဘက် ဗုံးကြဲ',body:'Kyauktaw မြို့နယ် ကျောင်း 2 ခုကို ညဘက် လေကြောင်းဗုံးကြဲတိုက်ခိုက်မှုကြောင့် ကျောင်းသား 23 ဦး သေဆုံးကာ 20 ဦးကျော် ဒဏ်ရာရသည်',dead:23,inj:20,src:'Fortify Rights'},
+  {id:'e3',date:'2025-08-17',year:2025,type:'air',state:'Karenni',twp:'Mawchi',title:'မူကြိုကျောင်း ဗုံးကျ',body:'Mawchi မြို့နယ် မူကြိုကျောင်းကို လေကြောင်းဗုံးကျမှုကြောင့် ကလေး 5 ဦးအပါ 25 ဦး သေဆုံးသည်',dead:25,inj:15,src:'AAPP'},
+  {id:'e4',date:'2025-05-12',year:2025,type:'air',state:'Sagaing',twp:'Wetlet',title:'Oe Htein Kwin ကျောင်းပေါ် ဗုံးကျ',body:'Wetlet မြို့နယ် Oe Htein Kwin ကျောင်းကို နေ့ချင်းတည်းတွင် လေကြောင်းဗုံးကျမှုကြောင့် ကျောင်းသား 22 ဦးနှင့် ဆရာ 2 ဦး စုစုပေါင်း 24 ဦး သေဆုံးသည်',dead:24,inj:30,src:'Fortify Rights'},
+  {id:'e5',date:'2025-03-14',year:2025,type:'air',state:'Mandalay',twp:'Singu',title:'Let Pan Hla ဈေးကွက် ဗုံးကျ',body:'Singu မြို့နယ် Let Pan Hla ဈေးကွက်တွင် လေကြောင်းတိုက်ခိုက်မှုကြောင့် 2 နှစ်သားကလေးအပါ 27 ဦး သေဆုံးပြီး 55 ဦး ဒဏ်ရာရသည်',dead:27,inj:55,src:'RFA'},
+  {id:'e6',date:'2025-01-18',year:2025,type:'art',state:'Rakhine',twp:'Mrauk-U',title:'Mrauk-U မော်တာကျည် ရမ်းသမ်းပစ်',body:'Mrauk-U မြို့နယ် ဈေးကွက်နှင့် လမ်းသွားလမ်းလာ ပြည်သူများကို မော်တာကျည် ရမ်းသမ်းပစ်ခတ်မှုကြောင့် 28 ဦး သေဆုံးကာ 25 ဦး ဒဏ်ရာရသည်',dead:28,inj:25,src:'RFA'},
+  {id:'e7',date:'2024-02-01',year:2024,type:'arbd',state:'Nationwide',twp:'Nationwide',title:'စစ်မှုထမ်းဥပဒေ ထုတ်ပြန် — ဖမ်းဆီးစ',body:'စစ်ကောင်စီမှ စစ်မှုထမ်းဥပဒေ ထုတ်ပြန်ပြီးနောက် အသက် 18-35 မောင်ပျိုများကို အဓမ္မဖမ်းဆီးသည့် ဖြစ်ရပ်များ ပြည်နယ်/တိုင်းအနှံ့ ဖြစ်ပွားသည်',dead:0,inj:0,src:'AAPP'},
+  {id:'e8',date:'2023-04-11',year:2023,type:'air',state:'Sagaing',twp:'Pale',title:'Pazigyi ကျေးရွာ NLD ပွဲတော် ဗုံးကြဲ',body:'Pale မြို့နယ် Pazigyi ကျေးရွာတွင် NLD ပါတီ ပွဲတော်ကျင်းပနေသူများကို လေကြောင်းဗုံးကြဲမှုကြောင့် 168 ဦး သေဆုံးကာ 70 ဦးကျော် ဒဏ်ရာရသည်။ ၂၀၂၁-ယနေ့ကာလ တစ်ကြိမ်တည်းသေဆုံးသူ အများဆုံးဖြစ်ရပ်',dead:168,inj:70,src:'UN OHCHR'},
+];
+
+function renderEvents(events, container, append=false){
+  const html = events.map(e=>{
+    const c = TC[e.type]||'#888';
+    return `<div class="ev ${e.type}" onclick="openModal('${e.id||''}')">
+      <div class="ev-date">${e.date}</div>
+      <div class="ev-body">
+        <div class="ev-title">${e.state} · ${e.twp}</div>
+        <div class="ev-text">${e.title||e.body?.substring(0,100)||''}</div>
+        <div class="ev-footer">
+          <span class="ev-tag" style="background:${c}22;color:${c}">${TM[e.type]||e.type}</span>
+          ${e.dead>0?`<span class="ev-dead">သေ: ${e.dead}</span>`:''}
+          ${e.inj>0?`<span class="ev-inj">ဒဏ်: ${e.inj}</span>`:''}
+          <span style="font-size:9px;color:var(--tx3)">${e.src||''}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  if(append){
+    container.insertAdjacentHTML('beforeend',html);
+  } else {
+    container.innerHTML = html || '<div style="text-align:center;padding:40px;color:var(--tx3)">ဖြစ်ရပ် မတွေ့ပါ</div>';
+  }
+}
+
+function renderNews(events){
+  const grid = document.getElementById('news-grid');
+  if(!grid)return;
+  const icons = {air:'✈',art:'💥',kill:'⚠',arbd:'🔒',conscript:'🪖',drone:'🚁',idp:'🏕'};
+  const sorted = [...events].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,6);
+  grid.innerHTML = sorted.map((e,i)=>{
+    const c = TC[e.type]||'#888';
+    const featured = i===0 ? 'featured' : '';
+    return `<div class="news-card ${featured}" onclick="openModal('${e.id||''}')">
+      <div class="nc-img">
+        <div class="nc-img-placeholder">${icons[e.type]||'📋'}</div>
+        <div class="nc-type" style="background:${c}22;color:${c}">${TM[e.type]||e.type}</div>
+      </div>
+      <div class="nc-body">
+        <div class="nc-date">${e.date}</div>
+        <div class="nc-title">${e.title||e.twp+' — '+e.state}</div>
+        <div class="nc-text">${e.body||''}</div>
+        <div class="nc-footer">
+          <span class="nc-loc">${e.state}</span>
+          ${e.dead>0?`<span class="nc-stat" style="color:var(--red)">သေ: ${e.dead}</span>`:''}
+          ${e.inj>0?`<span class="nc-stat" style="color:var(--amb)">ဒဏ်: ${e.inj}</span>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterEvents(){
+  const q = document.getElementById('search-input').value.toLowerCase();
+  let filtered = SAMPLE_EVENTS.filter(e=>{
+    const matchQ = !q || [e.state,e.twp,e.title,e.body,e.date].some(v=>(v||'').toLowerCase().includes(q));
+    const matchT = activeTypes.size===0 || activeTypes.has(e.type);
+    return matchQ && matchT;
+  });
+  allEvents = filtered;
+  renderEvents(filtered.slice(0,PAGE_SIZE), document.getElementById('event-feed'));
+}
+
+function toggleType(btn){
+  const t = btn.dataset.type;
+  if(activeTypes.has(t)){activeTypes.delete(t);btn.classList.remove('on');}
+  else{activeTypes.add(t);btn.classList.add('on');}
+  filterEvents();
+}
+
+function loadMoreEvents(){
+  eventsPage++;
+  const start = (eventsPage-1)*PAGE_SIZE;
+  const more = allEvents.slice(start, start+PAGE_SIZE);
+  renderEvents(more, document.getElementById('event-feed'), true);
+}
+
+function loadMoreNews(){
+  document.getElementById('events').scrollIntoView({behavior:'smooth'});
+}
+
+// =================== MODAL ===================
+function openModal(id){
+  const ev = SAMPLE_EVENTS.find(e=>e.id===id) || SAMPLE_EVENTS[0];
+  if(!ev)return;
+  const c = TC[ev.type]||'#888';
+  document.getElementById('modal-content').innerHTML = `
+    <h2>${ev.title||ev.twp}</h2>
+    <div class="modal-meta">${ev.date} · ${ev.state}, ${ev.twp} · ရင်းမြစ်: ${ev.src||'—'}</div>
+    <div class="modal-stats">
+      <div class="ms-item"><div class="ms-num" style="color:var(--red)">${ev.dead||0}</div><div class="ms-label">သေဆုံး</div></div>
+      <div class="ms-item"><div class="ms-num" style="color:var(--amb)">${ev.inj||0}</div><div class="ms-label">ဒဏ်ရာ</div></div>
+      <div class="ms-item"><div class="ms-num" style="color:${c}"><span style="font-size:16px">${TM[ev.type]||ev.type}</span></div><div class="ms-label">အမျိုးအစား</div></div>
+    </div>
+    <div class="modal-body">${ev.body||''}</div>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal(e){
+  if(!e||e.target===document.getElementById('modal-overlay')||e.target.classList.contains('modal-close'))
+    document.getElementById('modal-overlay').classList.remove('open');
+}
+
+// =================== TICKER ===================
+function updateTicker(events){
+  const items = events.slice(0,8).map(e=>
+    `<span class="ticker-item"><strong>${e.state}</strong> ${e.title||e.twp} ${e.dead>0?'— သေ:'+e.dead+' ဦး':''}</span>`
+  ).join('');
+  const doubled = items+items;
+  document.getElementById('ticker').innerHTML = doubled;
+}
+
+// =================== FIREBASE INTEGRATION ===================
+function onFirebaseReady(){
+  const db = window.__db;
+  if(!db)return;
+  const eventsRef = window.__dbRef(db,'events');
+  const q = window.__query(eventsRef, window.__orderByChild('date'), window.__limitToLast(100));
+  window.__onValue(q, snap=>{
+    const data = snap.val();
+    if(!data)return;
+    const events = Object.entries(data).map(([k,v])=>({id:k,...v}))
+      .sort((a,b)=>b.date.localeCompare(a.date));
+    allEvents = events;
+    renderNews(events);
+    renderEvents(events.slice(0,PAGE_SIZE), document.getElementById('event-feed'));
+    updateTicker(events);
+    // Update stats from DB if available
+    const statsRef = window.__dbRef(db,'stats');
+    window.__onValue(statsRef, ssnap=>{
+      const s = ssnap.val();
+      if(!s)return;
+      if(s.dead){document.getElementById('h-dead').textContent=fmt(s.dead)+'+';}
+      if(s.inj){document.getElementById('h-inj').textContent=fmt(s.inj)+'+';}
+      if(s.arr){document.getElementById('h-arr').textContent=fmt(s.arr)+'+';}
+      if(s.dead){document.getElementById('s-dead').textContent=fmt(s.dead)+'+';}
+      document.getElementById('s-total').textContent=fmt(events.length);
+    });
+  });
+}
+
+function scrollTo(id){
+  document.querySelector(id)?.scrollIntoView({behavior:'smooth'});
+}
+
+// =================== INIT ===================
+document.addEventListener('DOMContentLoaded',()=>{
+  initStatic();
+  allEvents = SAMPLE_EVENTS;
+  renderNews(SAMPLE_EVENTS);
+  renderEvents(SAMPLE_EVENTS.slice(0,PAGE_SIZE), document.getElementById('event-feed'));
+  updateTicker(SAMPLE_EVENTS);
+});
+
+document.addEventListener('firebase-ready', onFirebaseReady);
+</script>
+</body>
+</html>
